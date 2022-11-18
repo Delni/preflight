@@ -5,6 +5,7 @@ import (
 	"os"
 	preflight "preflight/src"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +17,10 @@ Written with ❤️ in Go.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		systemCheck := preflight.ReadChecklistFile(args[0])
-		fmt.Println(systemCheck)
+		if _, err := tea.NewProgram(preflight.PreflighModel(systemCheck)).Run(); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	},
 }
 
