@@ -2,7 +2,10 @@ module preflight
 
 go 1.18
 
-require github.com/spf13/cobra v1.6.1
+require (
+	github.com/spf13/cobra v1.6.1
+	gopkg.in/yaml.v2 v2.4.0
+)
 
 require (
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect

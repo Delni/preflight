@@ -1,4 +1,4 @@
-package main
+package preflight
 
 type Checkpoint struct {
 	Name          string `yaml:"name"`

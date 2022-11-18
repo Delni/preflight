@@ -3,18 +3,20 @@ package main
 import (
 	"fmt"
 	"os"
+	preflight "preflight/src"
 
 	"github.com/spf13/cobra"
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "preflight",
+	Use:   "preflight [checklist file]",
 	Short: "Automate checklist to ensure you are ready to go",
 	Long: `A small CLI that will run some commands for you, depending on the chosen config. 
 Written with ❤️ in Go.`,
-
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		// Do Stuff Here
+		systemCheck := preflight.ReadChecklistFile(args[0])
+		fmt.Println(systemCheck)
 	},
 }
 
