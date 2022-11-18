@@ -1,0 +1,10 @@
+- name: Example
+  description: Why would you need to be able to do "Example"
+  optional: true # do not display error if this is not mandatory 
+  options:
+    - name: Example
+      # run any command, but if you just want to know if the command exist
+      # you can run: `command -v <command-to-run>`
+      command: "echo 'Hello world'"
+      documentation: https://link.to/install-guide
+  
