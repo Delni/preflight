@@ -2,23 +2,18 @@
 
 > Automate your tooling checklist with Preflight
 
-[![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white&style=flat-square)](https://go.dev/)
+![Go version](https://img.shields.io/github/go-mod/go-version/delni/preflight?style=flat-square&color=00ADD8)
+![Last Commit](https://img.shields.io/github/last-commit/delni/preflight?style=flat-square)
+![Contributors](https://img.shields.io/github/contributors/delni/preflight?style=flat-square)
+[![License](https://img.shields.io/github/license/delni/preflight?style=flat-square)](./LICENSE)
 
 ![demo](./docs/demo.gif)
-## Install ⬇️
 
+## Install ⬇️
 > 🚧 todo
 
 ## Usage 🚀
-
-> 🚧 work in progress
-Preflight will read one conf from the provided ones inside  checklists
-
-## Customize
-
-> 🚧 work in progress
-
-Interrested in using Preflight ? Simply copy our `checklists/template.yaml` and start customizing it. Once your checklist is ready, feel free to submit it in a PR
+> 🚧 todo
 
 ## How to contribute 📝
 
