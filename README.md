@@ -4,6 +4,7 @@
 
 [![Go](https://img.shields.io/badge/Go-00ADD8?logo=go&logoColor=white&style=flat-square)](https://go.dev/)
 
+![demo](./docs/demo.gif)
 ## Install ⬇️
 
 > 🚧 todo

@@ -1,0 +1,32 @@
+- name: Node version manager
+  description: "Manage node versions with one of the following tool"
+  options:
+    - name: nvm
+      command: command -v nvm
+      documentation: https://github.com/nvm-sh/nvm#installing-and-updating
+    - name: n
+      command: command -v n
+      documentation: https://github.com/tj/n#installation
+- name: VHS
+  description: VHS allow you to record your terminal
+  options:
+    - name: VHS
+      command: command -v vhs
+      documentation: https://github.com/charmbracelet/vhs#installation
+- name: Dummy
+  description: "This does nothing, this is just for the demo :D"
+  optional: true
+  options:
+    - name: echo
+      command: echo 'dummy command'
+      documentation: You need to install echo ?
+
+# - ansible
+# - terraform
+# - any python version (really, even 2.7 ?)
+# - any node version
+# - scaleway ssh
+# - aws_connect
+# - aws commands
+# - docker & compose
+# - grafana discovery
