@@ -10,7 +10,7 @@ import (
 )
 
 func ReadChecklistFile(path string) []SystemCheck {
-	buf, err := ioutil.ReadFile(fmt.Sprintf("./checklists/%s.yaml", path))
+	buf, err := ioutil.ReadFile(path)
 
 	if err != nil {
 		fmt.Printf("Checklist \"%s\" not found\n", path)
