@@ -23,10 +23,3 @@ Interrested in using Preflight ? Simply copy our `checklists/template.yaml` and 
 ## How to contribute 📝
 
 ➡️ See [CONTRIBUTING](./CONTRIBUTING.md) 
-
-## Owners
-
-> 🚧 todo
-
-- @nicdel
-- @marthi
