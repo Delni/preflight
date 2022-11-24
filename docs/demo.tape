@@ -15,18 +15,15 @@ Sleep 500ms
 # Run the command by pressing enter.
 Enter
 
+# Clean the preview for next command
 Sleep 5s
 Ctrl+L
 Sleep 1s
 
 # Type a command in the terminal.
 Type "preflight checklists/demo.yaml"
-
-# Pause for dramatic effect...
 Sleep 500ms
-
-# Run the command by pressing enter.
 Enter
 
 # Admire the output for a bit.
-Sleep 5s
+Sleep 10s
