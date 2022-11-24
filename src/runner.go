@@ -2,8 +2,8 @@ package preflight
 
 import (
 	"fmt"
+	"os/exec"
 	"strings"
-	"time"
 
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -17,11 +17,12 @@ var (
 )
 
 type preflightModel struct {
-	checks      []SystemCheck
-	spinner     spinner.Model
-	progress    progress.Model
-	activeIndex int
-	done        bool
+	checks                []SystemCheck
+	spinner               spinner.Model
+	progress              progress.Model
+	activeIndex           int
+	activeCheckpointIndex int
+	done                  bool
 }
 
 func PreflighModel(systemCheck []SystemCheck) preflightModel {
@@ -42,7 +43,7 @@ func PreflighModel(systemCheck []SystemCheck) preflightModel {
 
 func (p preflightModel) Init() tea.Cmd {
 	return tea.Batch(
-		p.checks[p.activeIndex].run(),
+		p.runNext(),
 		p.spinner.Tick,
 	)
 }
@@ -58,20 +59,28 @@ func (p preflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return p, tea.Quit
 		}
 	case systemCheckMsg:
-		if p.activeIndex >= len(p.checks)-1 {
-			// Everything's been installed. We're done!
-			p.done = true
-			return p, tea.Quit
+		p.activeCheckpointIndex++
+		if msg.check {
+			p.getActive().Check = msg.check
 		}
-		p.checks[p.activeIndex].Check = msg.check
-		p.activeIndex++
-		// Update progress bar
-		progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
-		return p, tea.Batch(
-			progressCmd,
-			tea.Printf(p.checks[p.activeIndex-1].RenderResult()),
-			p.checks[p.activeIndex].run(),
-		)
+		result := p.getActive().RenderResult()
+		if p.activeCheckpointIndex >= len(p.getActive().Checkpoints) {
+			p.activeCheckpointIndex = 0
+			p.activeIndex++
+			if p.activeIndex >= len(p.checks) {
+				// Everything's been installed. We're done!
+				p.done = true
+				return p, tea.Quit
+			}
+			progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
+			return p, tea.Batch(
+				progressCmd,
+				p.runNext(),
+				tea.Printf(result),
+			)
+		}
+		return p, p.runNext()
+
 	case progress.FrameMsg:
 		newModel, cmd := p.progress.Update(msg)
 		if newModel, ok := newModel.(progress.Model); ok {
@@ -104,12 +113,17 @@ func (p preflightModel) View() string {
 
 type systemCheckMsg struct{ check bool }
 
-func (s SystemCheck) run() tea.Cmd {
-	for _, checkpoint := range s.Checkpoints {
-		tea.Println(checkpoint.Name)
+func (p preflightModel) runNext() tea.Cmd {
+	cmd_raw := p.getActiveCommand()
+	return func() tea.Msg {
+		err := exec.Command("command", "-v", cmd_raw).Run()
+		return systemCheckMsg{check: err == nil}
 	}
-	d := time.Millisecond * time.Duration(500)
-	return tea.Tick(d, func(t time.Time) tea.Msg {
-		return systemCheckMsg{check: false}
-	})
+}
+
+func (p preflightModel) getActive() *SystemCheck {
+	return &p.checks[p.activeIndex]
+}
+func (p preflightModel) getActiveCommand() string {
+	return p.getActive().Checkpoints[p.activeCheckpointIndex].Command
 }

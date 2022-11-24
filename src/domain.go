@@ -27,7 +27,7 @@ var (
 	currentPkgNameStyle = lipgloss.NewStyle().Foreground(honey)
 	pkgNameStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("242"))
 	checkMark           = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
-	warningMark         = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("⚠")
+	warningMark         = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("!")
 	koMark              = lipgloss.NewStyle().Foreground(lipgloss.Color("197")).SetString("✕")
 )
 
