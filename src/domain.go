@@ -27,7 +27,8 @@ var (
 	currentPkgNameStyle = lipgloss.NewStyle().Foreground(honey)
 	pkgNameStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("242"))
 	checkMark           = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
-	koMark              = lipgloss.NewStyle().Foreground(lipgloss.Color("160")).SetString("✕")
+	warningMark         = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("⚠")
+	koMark              = lipgloss.NewStyle().Foreground(lipgloss.Color("197")).SetString("✕")
 )
 
 func (s SystemCheck) Render(active bool, spinner spinner.Model) string {
@@ -48,13 +49,17 @@ func (s SystemCheck) RenderResult() string {
 	desc := strings.Builder{}
 
 	if !s.Check {
-		icon = koMark.String()
-		name = koMark.Render(s.Name)
+		style := koMark
+		if s.Optional {
+			style = warningMark
+		}
+		icon = style.String()
+		name = style.Render(s.Name)
 		desc.WriteString(fmt.Sprintf("\n\t%s", s.Description))
 		for _, checkpoint := range s.Checkpoints {
 			desc.WriteString(fmt.Sprintf("\n\t%s\t%s", checkpoint.Name, checkpoint.Documentation))
 		}
 	}
 
-	return fmt.Sprintf("%s %s%s\n", icon, name, pkgNameStyle.Render(desc.String()))
+	return fmt.Sprintf("%s %s%s", icon, name, pkgNameStyle.Render(desc.String()))
 }
