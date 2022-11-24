@@ -83,7 +83,7 @@ func (p preflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
 			return p, tea.Batch(
 				progressCmd,
-				tea.Tick(time.Millisecond*time.Duration(500), func(t time.Time) tea.Msg {
+				tea.Tick(time.Millisecond*time.Duration(250), func(t time.Time) tea.Msg {
 					return p.runNext()()
 				}),
 				tea.Printf(result),
