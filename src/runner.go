@@ -29,7 +29,6 @@ func PreflighModel(systemCheck []SystemCheck) preflightModel {
 	p := progress.New(
 		progress.WithDefaultGradient(),
 		// progress.WithWidth(40),
-		progress.WithoutPercentage(),
 	)
 	s := spinner.New()
 	s.Spinner = spinner.Jump
@@ -51,6 +50,8 @@ func (p preflightModel) Init() tea.Cmd {
 func (p preflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		p.progress.Width = msg.Width
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "ctrl+c", "esc", "q":
@@ -97,7 +98,6 @@ func (p preflightModel) View() string {
 	}
 
 	view.WriteString(p.progress.View())
-	view.WriteString(fmt.Sprintf(" %d / %d", p.activeIndex+1, len(p.checks)))
 
 	return view.String()
 }
