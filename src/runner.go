@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -23,6 +24,13 @@ type preflightModel struct {
 	activeIndex           int
 	activeCheckpointIndex int
 	done                  bool
+}
+
+func (p preflightModel) getActive() *SystemCheck {
+	return &p.checks[p.activeIndex]
+}
+func (p preflightModel) getActiveCheckpoint() Checkpoint {
+	return p.getActive().Checkpoints[p.activeCheckpointIndex]
 }
 
 func PreflighModel(systemCheck []SystemCheck) preflightModel {
@@ -75,7 +83,9 @@ func (p preflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
 			return p, tea.Batch(
 				progressCmd,
-				p.runNext(),
+				tea.Tick(time.Millisecond*time.Duration(500), func(t time.Time) tea.Msg {
+					return p.runNext()()
+				}),
 				tea.Printf(result),
 			)
 		}
@@ -105,7 +115,7 @@ func (p preflightModel) View() string {
 	for i := p.activeIndex; i < len(p.checks); i++ {
 		view.WriteString(p.checks[i].Render(i == p.activeIndex, p.spinner))
 	}
-
+	view.WriteString("\n")
 	view.WriteString(p.progress.View())
 
 	return view.String()
@@ -114,16 +124,34 @@ func (p preflightModel) View() string {
 type systemCheckMsg struct{ check bool }
 
 func (p preflightModel) runNext() tea.Cmd {
-	cmd_raw := p.getActiveCommand()
+	checkpoint := p.getActiveCheckpoint()
+	cmd_raw := strings.Split(checkpoint.Command, " ")
+	cmd_args := []string{"command", "-v"}
+	cmd_args = append(cmd_args, cmd_raw...)
+
+	if checkpoint.LiveRun {
+		cmd_args = strings.Split(checkpoint.Command, " ")
+	}
+	args := []string{}
+	if len(cmd_args) > 1 {
+		args = cmd_args[1 : len(cmd_args)-1]
+	}
+	command := exec.Command(cmd_args[0], args...)
+
+	if checkpoint.LiveRun {
+		// Run in a blocking fashion way
+
+		return tea.Batch(
+			tea.EnterAltScreen,
+			tea.ExecProcess(command, func(err error) tea.Msg {
+				return systemCheckMsg{check: err == nil}
+			}),
+			tea.ExitAltScreen,
+		)
+	}
+	// Run check only
 	return func() tea.Msg {
-		err := exec.Command("command", "-v", cmd_raw).Run()
+		err := command.Run()
 		return systemCheckMsg{check: err == nil}
 	}
-}
-
-func (p preflightModel) getActive() *SystemCheck {
-	return &p.checks[p.activeIndex]
-}
-func (p preflightModel) getActiveCommand() string {
-	return p.getActive().Checkpoints[p.activeCheckpointIndex].Command
 }

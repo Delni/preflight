@@ -12,7 +12,7 @@ type Checkpoint struct {
 	Name          string `yaml:"name"`
 	Command       string `yaml:"command"`
 	Documentation string `yaml:"documentation"`
-	Check         bool
+	LiveRun       bool   `yaml:"live_run"`
 }
 
 type SystemCheck struct {
@@ -45,7 +45,7 @@ func (s SystemCheck) Render(active bool, spinner spinner.Model) string {
 
 func (s SystemCheck) RenderResult() string {
 	icon := checkMark.String()
-	name := pkgNameStyle.Render(s.Name)
+	name := checkMark.Render(s.Name)
 	desc := strings.Builder{}
 
 	if !s.Check {
