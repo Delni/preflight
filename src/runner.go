@@ -72,7 +72,7 @@ func (p PreflightModel) View() string {
 
 	if p.done {
 		view.WriteString(p.checks[len(p.checks)-1].RenderResult())
-		view.WriteString(checkMark.Render("\nDone! 🛫\n"))
+		view.WriteString(p.RenderConclusion())
 		return view.String()
 	}
 

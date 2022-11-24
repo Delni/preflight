@@ -86,3 +86,28 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (tea.Model, tea.
 	}
 	return p, p.runCheckpoint()
 }
+
+func (p PreflightModel) RenderConclusion() string {
+	hasFail := false
+	hasWarning := false
+	for _, systemCheck := range p.checks {
+		if !systemCheck.Check {
+			if systemCheck.Optional {
+				hasWarning = true
+			} else {
+				hasFail = true
+				break
+			}
+		}
+	}
+
+	if hasFail {
+		return koMark.Render("\n\n No go, no go! Check above for more details. 🛬\n")
+	}
+
+	if hasWarning {
+		return warningMark.Render("\n\n You're good to go, but check above, some checks were unsuccessful 🎫\n")
+	}
+
+	return checkMark.Render("\n\nDone! You're good to go 🛫\n")
+}
