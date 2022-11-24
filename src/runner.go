@@ -2,9 +2,7 @@ package preflight
 
 import (
 	"fmt"
-	"os/exec"
 	"strings"
-	"time"
 
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -13,50 +11,35 @@ import (
 )
 
 var (
-	honey = lipgloss.Color("#febe3c")
-	ocean = lipgloss.Color("#1686cb")
+	honey     = lipgloss.Color("#febe3c")
+	ocean     = lipgloss.Color("#1686cb")
+	white     = lipgloss.Color("#ffffff")
+	greetings = lipgloss.NewStyle().Foreground(ocean).SetString("Checking preflight conditions:\n")
 )
 
-type preflightModel struct {
-	checks                []SystemCheck
-	spinner               spinner.Model
-	progress              progress.Model
-	activeIndex           int
-	activeCheckpointIndex int
-	done                  bool
-}
-
-func (p preflightModel) getActive() *SystemCheck {
-	return &p.checks[p.activeIndex]
-}
-func (p preflightModel) getActiveCheckpoint() Checkpoint {
-	return p.getActive().Checkpoints[p.activeCheckpointIndex]
-}
-
-func PreflighModel(systemCheck []SystemCheck) preflightModel {
-	fmt.Println(lipgloss.NewStyle().Foreground(ocean).Render("Checking preflight conditions:"))
+func PreflighModel(systemCheck []SystemCheck) PreflightModel {
+	fmt.Println(greetings.String())
 	p := progress.New(
-		progress.WithDefaultGradient(),
-		// progress.WithWidth(40),
+		progress.WithGradient(string(ocean), string(white)),
 	)
 	s := spinner.New()
 	s.Spinner = spinner.Jump
 	s.Style = lipgloss.NewStyle().Foreground(honey)
-	return preflightModel{
+	return PreflightModel{
 		checks:   systemCheck,
 		spinner:  s,
 		progress: p,
 	}
 }
 
-func (p preflightModel) Init() tea.Cmd {
+func (p PreflightModel) Init() tea.Cmd {
 	return tea.Batch(
-		p.runNext(),
+		p.runCheckpoint(),
 		p.spinner.Tick,
 	)
 }
 
-func (p preflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (p PreflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -67,43 +50,24 @@ func (p preflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return p, tea.Quit
 		}
 	case systemCheckMsg:
-		p.activeCheckpointIndex++
-		if msg.check {
-			p.getActive().Check = msg.check
-		}
-		result := p.getActive().RenderResult()
-		if p.activeCheckpointIndex >= len(p.getActive().Checkpoints) {
-			p.activeCheckpointIndex = 0
-			p.activeIndex++
-			if p.activeIndex >= len(p.checks) {
-				// Everything's been installed. We're done!
-				p.done = true
-				return p, tea.Quit
-			}
-			progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
-			return p, tea.Batch(
-				progressCmd,
-				tea.Tick(time.Millisecond*time.Duration(250), func(t time.Time) tea.Msg {
-					return p.runNext()()
-				}),
-				tea.Printf(result),
-			)
-		}
-		return p, p.runNext()
-
+		return p.UpdateInternalState(msg)
 	case progress.FrameMsg:
-		newModel, cmd := p.progress.Update(msg)
-		if newModel, ok := newModel.(progress.Model); ok {
-			p.progress = newModel
-		}
-		return p, cmd
+		p.UpdateProgress(msg)
 	default:
 		p.spinner, cmd = p.spinner.Update(msg)
 	}
 	return p, cmd
 }
 
-func (p preflightModel) View() string {
+func (p PreflightModel) UpdateProgress(msg progress.FrameMsg) (PreflightModel, tea.Cmd) {
+	newModel, cmd := p.progress.Update(msg)
+	if newModel, ok := newModel.(progress.Model); ok {
+		p.progress = newModel
+	}
+	return p, cmd
+}
+
+func (p PreflightModel) View() string {
 	view := strings.Builder{}
 
 	if p.done {
@@ -119,39 +83,4 @@ func (p preflightModel) View() string {
 	view.WriteString(p.progress.View())
 
 	return view.String()
-}
-
-type systemCheckMsg struct{ check bool }
-
-func (p preflightModel) runNext() tea.Cmd {
-	checkpoint := p.getActiveCheckpoint()
-	cmd_raw := strings.Split(checkpoint.Command, " ")
-	cmd_args := []string{"command", "-v"}
-	cmd_args = append(cmd_args, cmd_raw...)
-
-	if checkpoint.LiveRun {
-		cmd_args = strings.Split(checkpoint.Command, " ")
-	}
-	args := []string{}
-	if len(cmd_args) > 1 {
-		args = cmd_args[1 : len(cmd_args)-1]
-	}
-	command := exec.Command(cmd_args[0], args...)
-
-	if checkpoint.LiveRun {
-		// Run in a blocking fashion way
-
-		return tea.Batch(
-			tea.EnterAltScreen,
-			tea.ExecProcess(command, func(err error) tea.Msg {
-				return systemCheckMsg{check: err == nil}
-			}),
-			tea.ExitAltScreen,
-		)
-	}
-	// Run check only
-	return func() tea.Msg {
-		err := command.Run()
-		return systemCheckMsg{check: err == nil}
-	}
 }
