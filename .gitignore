@@ -1,2 +1,5 @@
 checklists
 !checklists/demo.yaml
+
+# ignore generated files
+bin
