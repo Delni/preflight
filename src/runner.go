@@ -52,7 +52,7 @@ func (p PreflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case systemCheckMsg:
 		return p.UpdateInternalState(msg)
 	case progress.FrameMsg:
-		p.UpdateProgress(msg)
+		return p.UpdateProgress(msg)
 	default:
 		p.spinner, cmd = p.spinner.Update(msg)
 	}
