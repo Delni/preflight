@@ -3,6 +3,7 @@ package preflight
 import (
 	"fmt"
 	"os/exec"
+	"runtime"
 	"time"
 
 	"github.com/charmbracelet/bubbles/progress"
@@ -30,7 +31,7 @@ type systemCheckMsg struct{ check bool }
 
 func (p PreflightModel) runCheckpoint() tea.Cmd {
 	checkpoint := p.getActiveCheckpoint()
-	interpreter := getInterpreterCommand()
+	interpreter := getInterpreterCommand(runtime.GOOS)
 	interpreterArg := interpreter.InterpreterArgs
 	if checkpoint.UseInteractive {
 		interpreterArg = interpreter.InterpreterInteractiveArgs

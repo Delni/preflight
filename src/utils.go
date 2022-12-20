@@ -2,7 +2,6 @@ package preflight
 
 import (
 	"log"
-	"runtime"
 )
 
 type OSInterpreter struct {
@@ -13,8 +12,7 @@ type OSInterpreter struct {
 	CommandArgs                string
 }
 
-func getInterpreterCommand() OSInterpreter {
-	os := runtime.GOOS
+func getInterpreterCommand(os string) OSInterpreter {
 	switch os {
 	case "windows":
 		return OSInterpreter{
