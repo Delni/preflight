@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	preflight "preflight/src"
+	"sort"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -22,6 +23,9 @@ Written with %s in %s.`, heart.Render("❤️"), golor.Render("Go")),
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		systemCheck := preflight.ReadChecklistFile(args[0])
+		sort.SliceStable(systemCheck, func(a, b int) bool {
+			return systemCheck[a].Name < systemCheck[b].Name
+		})
 		if _, err := tea.NewProgram(preflight.PreflighModel(systemCheck)).Run(); err != nil {
 			fmt.Println(err)
 			os.Exit(1)

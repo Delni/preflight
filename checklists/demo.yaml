@@ -1,22 +1,22 @@
-- name: First Passing command 
+- name: A. First Passing command 
   description: 
   checkpoints:
     - name: echo
       command: echo
       documentation: 
-- name: Second Passing command
+- name: B. Second Passing command
   description: 
   checkpoints:
     - name: echo
       command: echo
       documentation: 
-- name: Third Passing command
+- name: C. Third Passing command
   description: 
   checkpoints:
     - name: echo
       command: echo
       documentation: 
-- name: Optional Command
+- name: D. Optional Command
   description: "This does nothing, this is just for the demo :D"
   optional: true
   checkpoints:
@@ -26,7 +26,7 @@
     - name: second option
       command: this is failing
       documentation: You need one of the checkpoints though
-- name: Failing Command
+- name: F. Failing Command
   description: This will fail, you should do something about it
   checkpoints:
     - name: fail
