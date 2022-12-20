@@ -9,10 +9,10 @@ import (
 )
 
 type Checkpoint struct {
-	Name          string `yaml:"name"`
-	Command       string `yaml:"command"`
-	Documentation string `yaml:"documentation"`
-	LiveRun       bool   `yaml:"live_run"`
+	Name           string `yaml:"name"`
+	Command        string `yaml:"command"`
+	Documentation  string `yaml:"documentation"`
+	UseInteractive bool   `yaml:"use_interactive"`
 }
 
 type SystemCheck struct {

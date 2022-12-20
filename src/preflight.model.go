@@ -1,8 +1,8 @@
 package preflight
 
 import (
+	"fmt"
 	"os/exec"
-	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/progress"
@@ -30,30 +30,13 @@ type systemCheckMsg struct{ check bool }
 
 func (p PreflightModel) runCheckpoint() tea.Cmd {
 	checkpoint := p.getActiveCheckpoint()
-	cmd_raw := strings.Split(checkpoint.Command, " ")
-	cmd_args := []string{"command", "-v"}
-	cmd_args = append(cmd_args, cmd_raw...)
-
-	if checkpoint.LiveRun {
-		cmd_args = strings.Split(checkpoint.Command, " ")
+	bashArg := "-c"
+	if checkpoint.UseInteractive {
+		bashArg += "i"
 	}
-	args := []string{}
-	if len(cmd_args) > 1 {
-		args = cmd_args[1 : len(cmd_args)-1]
-	}
-	command := exec.Command(cmd_args[0], args...)
+	arg := fmt.Sprintf("command -v %s", checkpoint.Command)
+	command := exec.Command("bash", bashArg, arg)
 
-	if checkpoint.LiveRun {
-		// Run in a blocking fashion way
-
-		return tea.Batch(
-			tea.EnterAltScreen,
-			tea.ExecProcess(command, func(err error) tea.Msg {
-				return systemCheckMsg{check: err == nil}
-			}),
-			tea.ExitAltScreen,
-		)
-	}
 	// Run check only
 	return func() tea.Msg {
 		err := command.Run()
