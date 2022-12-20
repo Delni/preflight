@@ -30,12 +30,13 @@ type systemCheckMsg struct{ check bool }
 
 func (p PreflightModel) runCheckpoint() tea.Cmd {
 	checkpoint := p.getActiveCheckpoint()
-	bashArg := "-c"
+	interpreter := getInterpreterCommand()
+	interpreterArg := interpreter.InterpreterArgs
 	if checkpoint.UseInteractive {
-		bashArg += "i"
+		interpreterArg = interpreter.InterpreterInteractiveArgs
 	}
-	arg := fmt.Sprintf("command -v %s", checkpoint.Command)
-	command := exec.Command("bash", bashArg, arg)
+	arg := fmt.Sprintf("%s %s %s", interpreter.Command, interpreter.CommandArgs, checkpoint.Command)
+	command := exec.Command(interpreter.Interpreter, interpreterArg, arg)
 
 	// Run check only
 	return func() tea.Msg {

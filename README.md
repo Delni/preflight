@@ -44,7 +44,8 @@ And each `Checkpoint` is defined as follow:
 
 ## Roadmap 🚦
 
-- [x] File based decriptor  
+- [x] File based decriptor
+- [ ] Use Gitlab URL for raw checklist instead of local file
 - [ ] Make it installable seamlessly
 - [ ] Add flag-based descriptor for major use-cases. Go fileless  
     Currently supported Systems:
