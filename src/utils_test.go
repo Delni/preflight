@@ -36,7 +36,7 @@ func TestGetInterpreterCommand(t *testing.T) {
 	for _, tt := range tests {
 		testname := fmt.Sprintf("GetIntrepreterCommand for OS %s", tt.os)
 		t.Run(testname, func(t *testing.T) {
-			ans := getInterpreterCommand(tt.os)
+			ans := GetInterpreterCommand(tt.os)
 			if ans != tt.want {
 				t.Errorf("got %+v, want %+v", ans, tt.want)
 			}

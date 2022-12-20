@@ -12,7 +12,7 @@ type OSInterpreter struct {
 	CommandArgs                string
 }
 
-func getInterpreterCommand(os string) OSInterpreter {
+func GetInterpreterCommand(os string) OSInterpreter {
 	switch os {
 	case "windows":
 		return OSInterpreter{
