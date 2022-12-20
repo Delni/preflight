@@ -63,7 +63,7 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (tea.Model, tea.
 		progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
 		return p, tea.Batch(
 			progressCmd,
-			tea.Tick(time.Millisecond*time.Duration(250), func(t time.Time) tea.Msg {
+			tea.Tick(time.Millisecond*time.Duration(150), func(t time.Time) tea.Msg {
 				return p.runCheckpoint()()
 			}),
 			tea.Printf(result),
