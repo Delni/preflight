@@ -39,7 +39,7 @@ And each `Checkpoint` is defined as follow:
 | :------------ | :------------: | :-------: | :---------- |
 | name          |    `string`    |    yes    |  Name of the command / label to display | 
 | command       |    `string`    |    yes    |  the actual command passed to the runner. By default, preflight will only assert if the command exist on your machine. |
-| use_interactive      |   `boolean`    |    no     | Default to `false`. Usefull when you need to execute a command in interactive sheel (it runs .bashrc file before, usefull for nvm) |  
+| use_interactive      |   `boolean`    |    no     | Default to `false`. Usefull when you need to execute a command in interactive shell (it runs .bashrc file before, usefull for nvm) |  
 | documentation |    `string`    |    yes    |  In case of failure, display some info to the user about what to do next. This should at least be a link to the documentation on how to install said command. |
 
 ## Roadmap 🚦
