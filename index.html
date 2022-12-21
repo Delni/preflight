@@ -1,0 +1,441 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>src: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">preflight/src/preflight.model.go (61.9%)</option>
+				
+				<option value="file1">preflight/src/reader.go (100.0%)</option>
+				
+				<option value="file2">preflight/src/runner.go (0.0%)</option>
+				
+				<option value="file3">preflight/src/system_check.model.go (100.0%)</option>
+				
+				<option value="file4">preflight/src/utils.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package preflight
+
+import (
+        "fmt"
+        "os"
+        "os/exec"
+        "runtime"
+        "time"
+
+        "github.com/charmbracelet/bubbles/progress"
+        "github.com/charmbracelet/bubbles/spinner"
+        tea "github.com/charmbracelet/bubbletea"
+)
+
+type PreflightModel struct {
+        checks                []SystemCheck
+        spinner               spinner.Model
+        progress              progress.Model
+        activeIndex           int
+        activeCheckpointIndex int
+        done                  bool
+}
+
+func (p PreflightModel) getActive() *SystemCheck <span class="cov8" title="1">{
+        return &amp;p.checks[p.activeIndex]
+}</span>
+func (p PreflightModel) getActiveCheckpoint() Checkpoint <span class="cov8" title="1">{
+        return p.getActive().Checkpoints[p.activeCheckpointIndex]
+}</span>
+
+type systemCheckMsg struct{ check bool }
+
+func (p PreflightModel) runCheckpoint() tea.Cmd <span class="cov8" title="1">{
+        checkpoint := p.getActiveCheckpoint()
+        interpreter, err := GetInterpreterCommand(runtime.GOOS)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println(err)
+                os.Exit(1)
+        }</span>
+        <span class="cov8" title="1">interpreterArg := interpreter.InterpreterArgs
+        if checkpoint.UseInteractive </span><span class="cov8" title="1">{
+                interpreterArg = interpreter.InterpreterInteractiveArgs
+        }</span>
+        <span class="cov8" title="1">arg := fmt.Sprintf("%s %s %s", interpreter.Command, interpreter.CommandArgs, checkpoint.Command)
+        command := exec.Command(interpreter.Interpreter, interpreterArg, arg)
+
+        // Run check only
+        return func() tea.Msg </span><span class="cov8" title="1">{
+                err := command.Run()
+                return systemCheckMsg{check: err == nil}
+        }</span>
+}
+
+func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (tea.Model, tea.Cmd) <span class="cov0" title="0">{
+        p.activeCheckpointIndex++
+        if msg.check </span><span class="cov0" title="0">{
+                p.getActive().Check = msg.check
+        }</span>
+        <span class="cov0" title="0">result := p.getActive().RenderResult()
+        if p.activeCheckpointIndex &gt;= len(p.getActive().Checkpoints) </span><span class="cov0" title="0">{
+                p.activeCheckpointIndex = 0
+                p.activeIndex++
+                if p.activeIndex &gt;= len(p.checks) </span><span class="cov0" title="0">{
+                        // Everything's been installed. We're done!
+                        p.done = true
+                        return p, tea.Quit
+                }</span>
+                <span class="cov0" title="0">progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
+                return p, tea.Batch(
+                        progressCmd,
+                        tea.Tick(time.Millisecond*time.Duration(150), func(t time.Time) tea.Msg </span><span class="cov0" title="0">{
+                                return p.runCheckpoint()()
+                        }</span>),
+                        tea.Printf(result),
+                )
+        }
+        <span class="cov0" title="0">return p, p.runCheckpoint()</span>
+}
+
+func (p PreflightModel) RenderConclusion() string <span class="cov8" title="1">{
+        hasFail := false
+        hasWarning := false
+        for _, systemCheck := range p.checks </span><span class="cov8" title="1">{
+                if !systemCheck.Check </span><span class="cov8" title="1">{
+                        if systemCheck.Optional </span><span class="cov8" title="1">{
+                                hasWarning = true
+                        }</span> else<span class="cov8" title="1"> {
+                                hasFail = true
+                                break</span>
+                        }
+                }
+        }
+
+        <span class="cov8" title="1">if hasFail </span><span class="cov8" title="1">{
+                return koMark.Render("\n\n No go, no go! Check above for more details. 🛬\n")
+        }</span>
+
+        <span class="cov8" title="1">if hasWarning </span><span class="cov8" title="1">{
+                return warningMark.Render("\n\n You're good to go, but check above, some checks were unsuccessful 🎫\n")
+        }</span>
+
+        <span class="cov8" title="1">return checkMark.Render("\n\nDone! You're good to go 🛫\n")</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package preflight
+
+import (
+        "fmt"
+        "io/ioutil"
+
+        "gopkg.in/yaml.v3"
+)
+
+func ReadChecklistFile(path string) ([]SystemCheck, error) <span class="cov8" title="1">{
+        buf, err := ioutil.ReadFile(path)
+
+        if err != nil </span><span class="cov8" title="1">{
+                return []SystemCheck{}, fmt.Errorf("checklist \"%s\" not found", path)
+        }</span>
+
+        <span class="cov8" title="1">data := []SystemCheck{}
+        err = yaml.Unmarshal(buf, &amp;data)
+        if err != nil </span><span class="cov8" title="1">{
+                return []SystemCheck{}, fmt.Errorf("cannot parse file: %v", err)
+        }</span>
+
+        <span class="cov8" title="1">return data, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package preflight
+
+import (
+        "fmt"
+        "strings"
+
+        "github.com/charmbracelet/bubbles/progress"
+        "github.com/charmbracelet/bubbles/spinner"
+        tea "github.com/charmbracelet/bubbletea"
+        "github.com/charmbracelet/lipgloss"
+)
+
+var (
+        honey     = lipgloss.Color("#febe3c")
+        ocean     = lipgloss.Color("#1686cb")
+        white     = lipgloss.Color("#ffffff")
+        greetings = lipgloss.NewStyle().Foreground(ocean).SetString("Checking preflight conditions:\n")
+)
+
+func PreflighModel(systemCheck []SystemCheck) PreflightModel <span class="cov0" title="0">{
+        fmt.Println(greetings.String())
+        p := progress.New(
+                progress.WithGradient(string(ocean), string(white)),
+        )
+        s := spinner.New()
+        s.Spinner = spinner.Jump
+        s.Style = lipgloss.NewStyle().Foreground(honey)
+        return PreflightModel{
+                checks:   systemCheck,
+                spinner:  s,
+                progress: p,
+        }
+}</span>
+
+func (p PreflightModel) Init() tea.Cmd <span class="cov0" title="0">{
+        return tea.Batch(
+                p.runCheckpoint(),
+                p.spinner.Tick,
+        )
+}</span>
+
+func (p PreflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) <span class="cov0" title="0">{
+        var cmd tea.Cmd
+        switch msg := msg.(type) </span>{
+        case tea.WindowSizeMsg:<span class="cov0" title="0">
+                p.progress.Width = msg.Width</span>
+        case tea.KeyMsg:<span class="cov0" title="0">
+                switch msg.String() </span>{
+                case "ctrl+c", "esc", "q":<span class="cov0" title="0">
+                        return p, tea.Quit</span>
+                }
+        case systemCheckMsg:<span class="cov0" title="0">
+                return p.UpdateInternalState(msg)</span>
+        case progress.FrameMsg:<span class="cov0" title="0">
+                return p.UpdateProgress(msg)</span>
+        default:<span class="cov0" title="0">
+                p.spinner, cmd = p.spinner.Update(msg)</span>
+        }
+        <span class="cov0" title="0">return p, cmd</span>
+}
+
+func (p PreflightModel) UpdateProgress(msg progress.FrameMsg) (PreflightModel, tea.Cmd) <span class="cov0" title="0">{
+        newModel, cmd := p.progress.Update(msg)
+        if newModel, ok := newModel.(progress.Model); ok </span><span class="cov0" title="0">{
+                p.progress = newModel
+        }</span>
+        <span class="cov0" title="0">return p, cmd</span>
+}
+
+func (p PreflightModel) View() string <span class="cov0" title="0">{
+        view := strings.Builder{}
+
+        if p.done </span><span class="cov0" title="0">{
+                view.WriteString(p.checks[len(p.checks)-1].RenderResult())
+                view.WriteString(p.RenderConclusion())
+                return view.String()
+        }</span>
+
+        <span class="cov0" title="0">for i := p.activeIndex; i &lt; len(p.checks); i++ </span><span class="cov0" title="0">{
+                view.WriteString(p.checks[i].Render(i == p.activeIndex, p.spinner))
+        }</span>
+        <span class="cov0" title="0">view.WriteString("\n")
+        view.WriteString(p.progress.View())
+
+        return view.String()</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package preflight
+
+import (
+        "fmt"
+        "strings"
+
+        "github.com/charmbracelet/bubbles/spinner"
+        "github.com/charmbracelet/lipgloss"
+)
+
+type Checkpoint struct {
+        Name           string `yaml:"name"`
+        Command        string `yaml:"command"`
+        Documentation  string `yaml:"documentation"`
+        UseInteractive bool   `yaml:"use_interactive"`
+}
+
+type SystemCheck struct {
+        Name        string       `yaml:"name"`
+        Description string       `yaml:"description"`
+        Optional    bool         `yaml:"optional"`
+        Checkpoints []Checkpoint `yaml:"checkpoints"`
+        Check       bool
+}
+
+var (
+        currentPkgNameStyle = lipgloss.NewStyle().Foreground(honey)
+        pkgNameStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("242"))
+        checkMark           = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
+        warningMark         = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("!")
+        koMark              = lipgloss.NewStyle().Foreground(lipgloss.Color("197")).SetString("✕")
+)
+
+func (s SystemCheck) Render(active bool, spinner spinner.Model) string <span class="cov8" title="1">{
+        icon := pkgNameStyle.Render("-")
+        checkName := pkgNameStyle.Render(s.Name)
+
+        if active </span><span class="cov8" title="1">{
+                icon = spinner.View()
+                checkName = currentPkgNameStyle.Render(s.Name)
+        }</span>
+
+        <span class="cov8" title="1">return fmt.Sprintf("%s %s\n", icon, checkName)</span>
+}
+
+func (s SystemCheck) RenderResult() string <span class="cov8" title="1">{
+        icon := checkMark.String()
+        name := checkMark.Render(s.Name)
+        desc := strings.Builder{}
+
+        if !s.Check </span><span class="cov8" title="1">{
+                style := koMark
+                if s.Optional </span><span class="cov8" title="1">{
+                        style = warningMark
+                }</span>
+                <span class="cov8" title="1">icon = style.String()
+                name = style.Render(s.Name)
+                desc.WriteString(fmt.Sprintf("\n\t%s", s.Description))
+                for _, checkpoint := range s.Checkpoints </span><span class="cov8" title="1">{
+                        desc.WriteString(fmt.Sprintf("\n\t%s\t%s", checkpoint.Name, checkpoint.Documentation))
+                }</span>
+        }
+
+        <span class="cov8" title="1">return fmt.Sprintf("%s %s%s", icon, name, pkgNameStyle.Render(desc.String()))</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package preflight
+
+import (
+        "fmt"
+)
+
+type OSInterpreter struct {
+        Interpreter                string
+        InterpreterArgs            string
+        InterpreterInteractiveArgs string
+        Command                    string
+        CommandArgs                string
+}
+
+func GetInterpreterCommand(os string) (OSInterpreter, error) <span class="cov8" title="1">{
+        switch os </span>{
+        case "windows":<span class="cov8" title="1">
+                return OSInterpreter{
+                        Interpreter:                "powershell.exe",
+                        InterpreterArgs:            "",
+                        InterpreterInteractiveArgs: "",
+                        Command:                    "command",
+                        CommandArgs:                "",
+                }, nil</span>
+        case "darwin":<span class="cov8" title="1">
+                return OSInterpreter{
+                        Interpreter:                "bash",
+                        InterpreterArgs:            "-c",
+                        InterpreterInteractiveArgs: "-ic",
+                        Command:                    "command",
+                        CommandArgs:                "-v",
+                }, nil</span>
+        case "linux":<span class="cov8" title="1">
+                return OSInterpreter{
+                        Interpreter:                "bash",
+                        InterpreterArgs:            "-c",
+                        InterpreterInteractiveArgs: "-ic",
+                        Command:                    "command",
+                        CommandArgs:                "-v",
+                }, nil</span>
+        default:<span class="cov8" title="1">
+                return OSInterpreter{}, fmt.Errorf("OS %s is not currently supported", os)</span>
+        }
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
