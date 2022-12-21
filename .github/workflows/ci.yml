@@ -25,6 +25,16 @@ jobs:
           go tool cover -html=coverage.out -o=coverage-report/index.html
           go tool cover -func=coverage.out -o=coverage.out
           echo "COVERAGE_PERCENTAGE=$(cat coverage.out | grep total | grep -Po '\d+(?:\.\d+)?%')" >> $GITHUB_ENV
+          pct=$(echo $COVERAGE_PERCENTAGE | sed "s/%//")
+          pct_int=${pct/\.*}
+          if [[ $pct_int -lt 30 ]]; then
+            color=red
+          elif [[ $pct_int -lt 70 ]]; then
+            color=orange
+          else
+            color=green
+          fi
+          echo "COVERAGE_BADGE_COLOR=$(echo $color)" >> $GITHUB_ENV
 
       - name: Generate coverage badge
         uses: emibcn/badge-action@v1.2.1
