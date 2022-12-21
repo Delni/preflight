@@ -1,7 +1,7 @@
 package preflight
 
 import (
-	"log"
+	"fmt"
 )
 
 type OSInterpreter struct {
@@ -12,7 +12,7 @@ type OSInterpreter struct {
 	CommandArgs                string
 }
 
-func GetInterpreterCommand(os string) OSInterpreter {
+func GetInterpreterCommand(os string) (OSInterpreter, error) {
 	switch os {
 	case "windows":
 		return OSInterpreter{
@@ -21,7 +21,7 @@ func GetInterpreterCommand(os string) OSInterpreter {
 			InterpreterInteractiveArgs: "",
 			Command:                    "command",
 			CommandArgs:                "",
-		}
+		}, nil
 	case "darwin":
 		return OSInterpreter{
 			Interpreter:                "bash",
@@ -29,7 +29,7 @@ func GetInterpreterCommand(os string) OSInterpreter {
 			InterpreterInteractiveArgs: "-ic",
 			Command:                    "command",
 			CommandArgs:                "-v",
-		}
+		}, nil
 	case "linux":
 		return OSInterpreter{
 			Interpreter:                "bash",
@@ -37,9 +37,8 @@ func GetInterpreterCommand(os string) OSInterpreter {
 			InterpreterInteractiveArgs: "-ic",
 			Command:                    "command",
 			CommandArgs:                "-v",
-		}
+		}, nil
 	default:
-		log.Fatalf("OS %s is not currently supported", os)
-		return OSInterpreter{}
+		return OSInterpreter{}, fmt.Errorf("OS %s is not currently supported", os)
 	}
 }
