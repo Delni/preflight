@@ -30,7 +30,7 @@ jobs:
         uses: emibcn/badge-action@v1.2.1
         with:
           label: 'Coverage'
-          status: $COVERAGE_PERCENTAGE
+          status: ${{COVERAGE_PERCENTAGE}}
           color: 'green'
           path: 'coverage-report/coverage-badge.svg'
 
