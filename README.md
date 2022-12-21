@@ -7,7 +7,7 @@
 ![Contributors](https://img.shields.io/github/contributors/delni/preflight?style=flat)
 [![License](https://img.shields.io/github/license/delni/preflight?style=flat)](./LICENSE)
 ![Build](https://github.com/Delni/preflight/actions/workflows/ci.yml/badge.svg)
-![Coverage](https://delni.github.io/preflight/coverage-badge.svg)
+[![Coverage](https://delni.github.io/preflight/coverage-badge.svg)](https://delni.github.io/preflight/index.html)
 
 Preflight will run a list of commands for you to make sure that you are ready to go on your journey. This can be usefull when you are reinstalling your computer and are used to some configuration, or to make sure that the onboarding in a new team is complete.  
 
