@@ -7,7 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 )
 
-func mockSystemCheck() SystemCheck {
+func fakeSystemCheck() SystemCheck {
 	return SystemCheck{
 		Name:        "SYSTEM_CHECK",
 		Description: "DESCRIPTION",
@@ -19,7 +19,7 @@ func mockSystemCheck() SystemCheck {
 	}
 }
 
-func mockSpinner() spinner.Model {
+func fakeSpinner() spinner.Model {
 	return spinner.New()
 }
 
@@ -32,8 +32,8 @@ func assertMultipleContains(t *testing.T, ans string, want []string) {
 }
 
 func TestRenderActive(t *testing.T) {
-	system := mockSystemCheck()
-	spinner := mockSpinner()
+	system := fakeSystemCheck()
+	spinner := fakeSpinner()
 
 	ans := system.Render(true, spinner)
 
@@ -44,8 +44,8 @@ func TestRenderActive(t *testing.T) {
 }
 
 func TestRenderInactive(t *testing.T) {
-	system := mockSystemCheck()
-	spinner := mockSpinner()
+	system := fakeSystemCheck()
+	spinner := fakeSpinner()
 
 	ans := system.Render(false, spinner)
 
@@ -56,7 +56,7 @@ func TestRenderInactive(t *testing.T) {
 }
 
 func TestRenderResultUnchecked(t *testing.T) {
-	system := mockSystemCheck()
+	system := fakeSystemCheck()
 
 	ans := system.RenderResult()
 
@@ -65,7 +65,7 @@ func TestRenderResultUnchecked(t *testing.T) {
 }
 
 func TestRenderResultUncheckedWarning(t *testing.T) {
-	system := mockSystemCheck()
+	system := fakeSystemCheck()
 	system.Optional = true
 
 	ans := system.RenderResult()
@@ -75,7 +75,7 @@ func TestRenderResultUncheckedWarning(t *testing.T) {
 }
 
 func TestRenderResultChecked(t *testing.T) {
-	system := mockSystemCheck()
+	system := fakeSystemCheck()
 	system.Check = true
 
 	ans := system.RenderResult()
