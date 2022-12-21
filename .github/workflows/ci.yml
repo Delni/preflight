@@ -20,9 +20,9 @@ jobs:
       - name: Test
         run: |
           go test -v ./src -covermode=count -coverprofile=coverage.out
-          go tool cover -func=coverage.out -o=coverage.out
+          go tool cover -func=coverage.out -html=coverage-report/index.html
 
       - name: Publish coverage report to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          filename: coverage.out
+          folder: coverage-report
