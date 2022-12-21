@@ -23,13 +23,15 @@ jobs:
           mkdir coverage-report
           touch coverage-report/index.html
           go tool cover -html=coverage.out -o=coverage-report/index.html
+          go tool cover -func=coverage.out -o=coverage.out
+          echo "COVERAGE_PERCENTAGE=$(cat coverage.out | grep total | grep -Po '\d+(?:\.\d+)?%')" >> $GITHUB_ENV
 
       - name: Generate coverage badge
         uses: emibcn/badge-action@v1.2.1
         with:
-          label: 'Test coverage'
-          status: '53.4%'
-          color: 'blue,555,daf'
+          label: 'Coverage'
+          status: $COVERAGE_PERCENTAGE
+          color: 'green'
           path: 'coverage-report/coverage-badge.svg'
 
       - name: Publish coverage report to GitHub Pages
