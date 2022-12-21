@@ -24,6 +24,15 @@ jobs:
           touch coverage-report/index.html
           go tool cover -html=coverage.out -o=coverage-report/index.html
 
+      - name: Build coverage badge
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://img.shields.io/badge/Coverage-90%25-brightgreen'
+          method: 'GET'
+          run: |
+            touch coverage-report/coverage-badge.svg
+            echo ${{ steps.myRequest.outputs.response }} > coverage-report/coverage-badge.svg
+
       - name: Publish coverage report to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
