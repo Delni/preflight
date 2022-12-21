@@ -55,11 +55,11 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">preflight/src/preflight.model.go (61.9%)</option>
+				<option value="file0">preflight/src/preflight.model.go (85.7%)</option>
 				
 				<option value="file1">preflight/src/reader.go (100.0%)</option>
 				
-				<option value="file2">preflight/src/runner.go (0.0%)</option>
+				<option value="file2">preflight/src/runner.go (20.0%)</option>
 				
 				<option value="file3">preflight/src/system_check.model.go (100.0%)</option>
 				
@@ -130,16 +130,16 @@ func (p PreflightModel) runCheckpoint() tea.Cmd <span class="cov8" title="1">{
         }</span>
 }
 
-func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (tea.Model, tea.Cmd) <span class="cov0" title="0">{
+func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel, tea.Cmd) <span class="cov8" title="1">{
         p.activeCheckpointIndex++
-        if msg.check </span><span class="cov0" title="0">{
+        if msg.check </span><span class="cov8" title="1">{
                 p.getActive().Check = msg.check
         }</span>
-        <span class="cov0" title="0">result := p.getActive().RenderResult()
-        if p.activeCheckpointIndex &gt;= len(p.getActive().Checkpoints) </span><span class="cov0" title="0">{
+        <span class="cov8" title="1">result := p.getActive().RenderResult()
+        if p.activeCheckpointIndex &gt;= len(p.getActive().Checkpoints) </span><span class="cov8" title="1">{
                 p.activeCheckpointIndex = 0
                 p.activeIndex++
-                if p.activeIndex &gt;= len(p.checks) </span><span class="cov0" title="0">{
+                if p.activeIndex &gt;= len(p.checks) </span><span class="cov8" title="1">{
                         // Everything's been installed. We're done!
                         p.done = true
                         return p, tea.Quit
@@ -227,7 +227,7 @@ var (
         greetings = lipgloss.NewStyle().Foreground(ocean).SetString("Checking preflight conditions:\n")
 )
 
-func PreflighModel(systemCheck []SystemCheck) PreflightModel <span class="cov0" title="0">{
+func PreflighModel(systemCheck []SystemCheck) PreflightModel <span class="cov8" title="1">{
         fmt.Println(greetings.String())
         p := progress.New(
                 progress.WithGradient(string(ocean), string(white)),
