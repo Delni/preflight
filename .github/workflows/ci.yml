@@ -25,15 +25,12 @@ jobs:
           go tool cover -html=coverage.out -o=coverage-report/index.html
 
       - name: Generate coverage badge
-        uses: fjogeleit/http-request-action@v1
+        uses: emibcn/badge-action@v1.2.1
         with:
-          url: 'https://img.shields.io/badge/Coverage-90%25-brightgreen'
-          method: 'GET'
-      
-      - name: Dump generated page into github pages
-        run: |
-          touch coverage-report/coverage-badge.svg
-          echo ${{ steps.myRequest.outputs.response }} > coverage-report/coverage-badge.svg
+          label: 'Test coverage'
+          status: '53.4%'
+          color: 'blue,555,daf'
+          path: 'coverage-report/coverage-badge.svg'
 
       - name: Publish coverage report to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
