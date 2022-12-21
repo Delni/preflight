@@ -24,8 +24,9 @@ jobs:
           touch coverage-report/index.html
           go tool cover -html=coverage.out -o=coverage-report/index.html
           go tool cover -func=coverage.out -o=coverage.out
-          echo "COVERAGE_PERCENTAGE=$(cat coverage.out | grep total | grep -Po '\d+(?:\.\d+)?%')" >> $GITHUB_ENV
-          pct=$(echo ${{ env.COVERAGE_PERCENTAGE }} | sed "s/%//")
+          pct=$(cat coverage.out | grep total | grep -Po '\d+(?:\.\d+)?%')
+          echo "COVERAGE_PERCENTAGE=$pct" >> $GITHUB_ENV
+          pct=$(echo $pct | sed "s/%//")
           pct_int=${pct/\.*}
           echo $pct_int
           if [[ $pct_int -lt 30 ]]; then
