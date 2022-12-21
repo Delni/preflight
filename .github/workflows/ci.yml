@@ -25,7 +25,7 @@ jobs:
           go tool cover -html=coverage.out -o=coverage-report/index.html
           go tool cover -func=coverage.out -o=coverage.out
           echo "COVERAGE_PERCENTAGE=$(cat coverage.out | grep total | grep -Po '\d+(?:\.\d+)?%')" >> $GITHUB_ENV
-          pct=$(echo $COVERAGE_PERCENTAGE | sed "s/%//")
+          pct=$(echo ${{ env.COVERAGE_PERCENTAGE }} | sed "s/%//")
           pct_int=${pct/\.*}
           echo $pct_int
           if [[ $pct_int -lt 30 ]]; then
@@ -43,7 +43,7 @@ jobs:
         with:
           label: 'Coverage'
           status: ${{ env.COVERAGE_PERCENTAGE }}
-          color: 'green'
+          color: ${{ env.COVERAGE_BADGE_COLOR }}
           path: 'coverage-report/coverage-badge.svg'
 
       - name: Publish coverage report to GitHub Pages
