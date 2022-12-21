@@ -69,6 +69,16 @@ func TestRunCheckpointSuccess(t *testing.T) {
 	}
 }
 
+func TestUpdateInternalStateFinished(t *testing.T) {
+	p := fakePreflightModel()
+
+	ans, _ := p.UpdateInternalState(systemCheckMsg{check: true})
+
+	if ans.done != true || ans.activeIndex != 1 {
+		t.Errorf("got %+v", ans)
+	}
+}
+
 func TestRenderConclusionFail(t *testing.T) {
 	p := fakePreflightModel()
 

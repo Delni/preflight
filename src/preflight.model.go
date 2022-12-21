@@ -51,7 +51,7 @@ func (p PreflightModel) runCheckpoint() tea.Cmd {
 	}
 }
 
-func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (tea.Model, tea.Cmd) {
+func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel, tea.Cmd) {
 	p.activeCheckpointIndex++
 	if msg.check {
 		p.getActive().Check = msg.check
