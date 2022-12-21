@@ -27,6 +27,7 @@ jobs:
           echo "COVERAGE_PERCENTAGE=$(cat coverage.out | grep total | grep -Po '\d+(?:\.\d+)?%')" >> $GITHUB_ENV
           pct=$(echo $COVERAGE_PERCENTAGE | sed "s/%//")
           pct_int=${pct/\.*}
+          echo $pct_int
           if [[ $pct_int -lt 30 ]]; then
             color=red
           elif [[ $pct_int -lt 70 ]]; then
@@ -34,6 +35,7 @@ jobs:
           else
             color=green
           fi
+          echo $color
           echo "COVERAGE_BADGE_COLOR=$(echo $color)" >> $GITHUB_ENV
 
       - name: Generate coverage badge
