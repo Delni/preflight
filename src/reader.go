@@ -3,25 +3,22 @@ package preflight
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
-	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
-func ReadChecklistFile(path string) []SystemCheck {
+func ReadChecklistFile(path string) ([]SystemCheck, error) {
 	buf, err := ioutil.ReadFile(path)
 
 	if err != nil {
-		fmt.Printf("Checklist \"%s\" not found\n", path)
-		os.Exit(1)
+		return []SystemCheck{}, fmt.Errorf("checklist \"%s\" not found", path)
 	}
 
 	data := []SystemCheck{}
 	err = yaml.Unmarshal(buf, &data)
 	if err != nil {
-		log.Fatalf("Cannot parse file: %v", err)
+		return []SystemCheck{}, fmt.Errorf("cannot parse file: %v", err)
 	}
 
-	return data
+	return data, nil
 }
