@@ -57,7 +57,7 @@
 				
 				<option value="file0">preflight/src/preflight.model.go (85.7%)</option>
 				
-				<option value="file1">preflight/src/reader.go (100.0%)</option>
+				<option value="file1">preflight/src/reader.go (46.7%)</option>
 				
 				<option value="file2">preflight/src/runner.go (53.3%)</option>
 				
@@ -185,23 +185,36 @@ func (p PreflightModel) RenderConclusion() string <span class="cov8" title="1">{
 		<pre class="file" id="file1" style="display: none">package preflight
 
 import (
-        "fmt"
+        "io"
         "io/ioutil"
+        "net/http"
 
         "gopkg.in/yaml.v3"
 )
 
-func ReadChecklistFile(path string) ([]SystemCheck, error) <span class="cov8" title="1">{
+func ReadFile(path string) ([]byte, error) <span class="cov8" title="1">{
         buf, err := ioutil.ReadFile(path)
+        return buf, err
+}</span>
 
-        if err != nil </span><span class="cov8" title="1">{
-                return []SystemCheck{}, fmt.Errorf("checklist \"%s\" not found", path)
+func ReadHttpFile(path string) ([]byte, error) <span class="cov0" title="0">{
+        resp, err := http.Get(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return []byte{}, err
         }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+        body, err := io.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return []byte{}, err
+        }</span>
+        <span class="cov0" title="0">return body, nil</span>
+}
 
-        <span class="cov8" title="1">data := []SystemCheck{}
-        err = yaml.Unmarshal(buf, &amp;data)
+func ReadChecklist(checklist []byte) ([]SystemCheck, error) <span class="cov8" title="1">{
+        data := []SystemCheck{}
+        err := yaml.Unmarshal(checklist, &amp;data)
         if err != nil </span><span class="cov8" title="1">{
-                return []SystemCheck{}, fmt.Errorf("cannot parse file: %v", err)
+                return []SystemCheck{}, err
         }</span>
 
         <span class="cov8" title="1">return data, nil</span>
