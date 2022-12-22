@@ -17,7 +17,7 @@ var (
 	greetings = lipgloss.NewStyle().Foreground(ocean).SetString("Checking preflight conditions:\n")
 )
 
-func PreflighModel(systemCheck []SystemCheck) PreflightModel {
+func InitPreflightModel(systemCheck []SystemCheck) PreflightModel {
 	fmt.Println(greetings.String())
 	p := progress.New(
 		progress.WithGradient(string(ocean), string(white)),

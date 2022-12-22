@@ -5,10 +5,10 @@ import (
 	"testing"
 )
 
-func TestPreflighModel(t *testing.T) {
+func TestPreflightModel(t *testing.T) {
 	s := fakeSystemCheck()
 
-	ans := PreflighModel([]SystemCheck{s})
+	ans := InitPreflightModel([]SystemCheck{s})
 	check := ans.checks[0]
 
 	if !reflect.DeepEqual(check, s) {
@@ -17,7 +17,7 @@ func TestPreflighModel(t *testing.T) {
 }
 
 func TestViewOnGoing(t *testing.T) {
-	p := fakePreflightModel()
+	p := FakePreflightModel()
 
 	ans := p.View()
 
@@ -26,7 +26,7 @@ func TestViewOnGoing(t *testing.T) {
 }
 
 func TestViewDone(t *testing.T) {
-	p := fakePreflightModel()
+	p := FakePreflightModel()
 	p.done = true
 
 	ans := p.View()
