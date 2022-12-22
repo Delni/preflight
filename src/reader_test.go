@@ -2,6 +2,7 @@ package preflight
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 	"reflect"
 	"strings"
@@ -10,25 +11,27 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func TestReadChecklistFile(t *testing.T) {
-	data := []SystemCheck{
-		{Name: "System", Description: "Descr", Optional: true, Checkpoints: []Checkpoint{
-			{Name: "Checkpoint", Command: "CMD", Documentation: "Doc", UseInteractive: true},
-		}},
-	}
-	dataStr, err := yaml.Marshal(&data)
+func fakeYamlSystemCheckBytes() []byte {
+	data := []SystemCheck{fakeSystemCheck()}
+	dataBytes, err := yaml.Marshal(&data)
 	if err != nil {
-		t.Error("Error while serializing YAML")
+		log.Fatal(err)
 	}
-	errWrite := ioutil.WriteFile("tmp.yaml", dataStr, 0644)
+	return dataBytes
+}
+
+func TestReadFile(t *testing.T) {
+	data := fakeYamlSystemCheckBytes()
+
+	errWrite := ioutil.WriteFile("tmp.yaml", data, 0644)
 	if errWrite != nil {
 		t.Error("Error while writing YAML file")
 	}
 
-	ans, _ := ReadChecklistFile("tmp.yaml")
+	fileContent, _ := ReadFile("tmp.yaml")
 
-	if !reflect.DeepEqual(ans, data) {
-		t.Errorf("got %+v, want %+v", 1, 2)
+	if string(fileContent) != string(data) {
+		t.Errorf("got %s, want %s", fileContent, data)
 	}
 
 	errDel := os.Remove("tmp.yaml")
@@ -37,30 +40,24 @@ func TestReadChecklistFile(t *testing.T) {
 	}
 }
 
-func TestReadChecklistFileMissingFile(t *testing.T) {
-	_, err := ReadChecklistFile("missing_file.yaml")
-
-	want := `checklist "missing_file.yaml" not found`
-	if err.Error() != want {
-		t.Errorf("got %+v, want %+v", err, want)
+func TestReadChecklist(t *testing.T) {
+	systemCheck, err := ReadChecklist(fakeYamlSystemCheckBytes())
+	if err != nil {
+		t.Errorf("got error %s when reading check list: ", err.Error())
 	}
+
+	want := []SystemCheck{fakeSystemCheck()}
+	if !reflect.DeepEqual(systemCheck, want) {
+		t.Errorf("got %+v, want %+v", systemCheck, want)
+	}
+
 }
 
-func TestReadChecklistFileMalformatedFile(t *testing.T) {
-	errWrite := ioutil.WriteFile("tmp.yaml", []byte("fake_yml"), 0644)
-	if errWrite != nil {
-		t.Error("Error while writing YAML file")
-	}
+func TestReadChecklistMalformatedFile(t *testing.T) {
+	_, err := ReadChecklist([]byte("fake_yml"))
 
-	_, err := ReadChecklistFile("tmp.yaml")
-
-	want := "cannot parse file: yaml: unmarshal errors"
+	want := "cannot unmarshal !!str `fake_yml` into []preflight.SystemCheck"
 	if !strings.Contains(err.Error(), want) {
 		t.Errorf("got %+v, want %+v", err, want)
-	}
-
-	errDel := os.Remove("tmp.yaml")
-	if errDel != nil {
-		t.Error("Error while deleting YAML file")
 	}
 }

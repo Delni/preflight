@@ -1,23 +1,36 @@
 package preflight
 
 import (
-	"fmt"
+	"io"
 	"io/ioutil"
+	"net/http"
 
 	"gopkg.in/yaml.v3"
 )
 
-func ReadChecklistFile(path string) ([]SystemCheck, error) {
+func ReadFile(path string) ([]byte, error) {
 	buf, err := ioutil.ReadFile(path)
+	return buf, err
+}
 
+func ReadHttpFile(path string) ([]byte, error) {
+	resp, err := http.Get(path)
 	if err != nil {
-		return []SystemCheck{}, fmt.Errorf("checklist \"%s\" not found", path)
+		return []byte{}, err
 	}
-
-	data := []SystemCheck{}
-	err = yaml.Unmarshal(buf, &data)
+	defer resp.Body.Close()
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return []SystemCheck{}, fmt.Errorf("cannot parse file: %v", err)
+		return []byte{}, err
+	}
+	return body, nil
+}
+
+func ReadChecklist(checklist []byte) ([]SystemCheck, error) {
+	data := []SystemCheck{}
+	err := yaml.Unmarshal(checklist, &data)
+	if err != nil {
+		return []SystemCheck{}, err
 	}
 
 	return data, nil
