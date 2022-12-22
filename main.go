@@ -47,7 +47,8 @@ Written with %s in %s.`, heart.Render("❤️"), golor.Render("Go")),
 		sort.SliceStable(systemCheck, func(a, b int) bool {
 			return systemCheck[a].Name < systemCheck[b].Name
 		})
-		if _, err := tea.NewProgram(preflight.PreflighModel(systemCheck)).Run(); err != nil {
+		// LoadHttpFileProgram()
+		if _, err := tea.NewProgram(preflight.InitPreflightModel(systemCheck)).Run(); err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
