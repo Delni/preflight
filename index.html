@@ -59,11 +59,13 @@
 				
 				<option value="file1">preflight/src/reader.go (46.7%)</option>
 				
-				<option value="file2">preflight/src/runner.go (53.3%)</option>
+				<option value="file2">preflight/src/render/load_http_file.go (0.0%)</option>
 				
-				<option value="file3">preflight/src/system_check.model.go (100.0%)</option>
+				<option value="file3">preflight/src/render/system_check.go (100.0%)</option>
 				
-				<option value="file4">preflight/src/utils.go (100.0%)</option>
+				<option value="file4">preflight/src/runner.go (53.3%)</option>
+				
+				<option value="file5">preflight/src/utils.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -83,16 +85,19 @@ import (
         "fmt"
         "os"
         "os/exec"
+        domain "preflight/src/domain"
+        "preflight/src/render"
         "runtime"
         "time"
 
         "github.com/charmbracelet/bubbles/progress"
         "github.com/charmbracelet/bubbles/spinner"
         tea "github.com/charmbracelet/bubbletea"
+        "github.com/charmbracelet/lipgloss"
 )
 
 type PreflightModel struct {
-        checks                []SystemCheck
+        checks                []domain.SystemCheck
         spinner               spinner.Model
         progress              progress.Model
         activeIndex           int
@@ -100,10 +105,10 @@ type PreflightModel struct {
         done                  bool
 }
 
-func (p PreflightModel) getActive() *SystemCheck <span class="cov8" title="1">{
+func (p PreflightModel) getActive() *domain.SystemCheck <span class="cov8" title="1">{
         return &amp;p.checks[p.activeIndex]
 }</span>
-func (p PreflightModel) getActiveCheckpoint() Checkpoint <span class="cov8" title="1">{
+func (p PreflightModel) getActiveCheckpoint() domain.Checkpoint <span class="cov8" title="1">{
         return p.getActive().Checkpoints[p.activeCheckpointIndex]
 }</span>
 
@@ -135,7 +140,7 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
         if msg.check </span><span class="cov8" title="1">{
                 p.getActive().Check = msg.check
         }</span>
-        <span class="cov8" title="1">result := p.getActive().RenderResult()
+        <span class="cov8" title="1">result := render.RenderResultFor(*p.getActive())
         if p.activeCheckpointIndex &gt;= len(p.getActive().Checkpoints) </span><span class="cov8" title="1">{
                 p.activeCheckpointIndex = 0
                 p.activeIndex++
@@ -155,6 +160,12 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
         }
         <span class="cov0" title="0">return p, p.runCheckpoint()</span>
 }
+
+var (
+        checkMark   = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
+        warningMark = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("!")
+        koMark      = lipgloss.NewStyle().Foreground(lipgloss.Color("197")).SetString("✕")
+)
 
 func (p PreflightModel) RenderConclusion() string <span class="cov8" title="1">{
         hasFail := false
@@ -188,6 +199,7 @@ import (
         "io"
         "io/ioutil"
         "net/http"
+        domain "preflight/src/domain"
 
         "gopkg.in/yaml.v3"
 )
@@ -210,21 +222,145 @@ func ReadHttpFile(path string) ([]byte, error) <span class="cov0" title="0">{
         <span class="cov0" title="0">return body, nil</span>
 }
 
-func ReadChecklist(checklist []byte) ([]SystemCheck, error) <span class="cov8" title="1">{
-        data := []SystemCheck{}
+func ReadChecklist(checklist []byte) ([]domain.SystemCheck, error) <span class="cov8" title="1">{
+        data := []domain.SystemCheck{}
         err := yaml.Unmarshal(checklist, &amp;data)
         if err != nil </span><span class="cov8" title="1">{
-                return []SystemCheck{}, err
+                return []domain.SystemCheck{}, err
         }</span>
 
         <span class="cov8" title="1">return data, nil</span>
 }
 </pre>
 		
-		<pre class="file" id="file2" style="display: none">package preflight
+		<pre class="file" id="file2" style="display: none">package render
 
 import (
         "fmt"
+
+        "github.com/charmbracelet/bubbles/spinner"
+        tea "github.com/charmbracelet/bubbletea"
+        "github.com/charmbracelet/lipgloss"
+)
+
+type responseMsg []byte
+
+type errMsg struct{ error }
+
+type model struct {
+        url      string
+        spinner  spinner.Model
+        quitting bool
+        err      error
+}
+
+func initialModel(url string) model <span class="cov0" title="0">{
+        s := spinner.New()
+        s.Spinner = spinner.MiniDot
+        s.Style = lipgloss.NewStyle().Foreground(Honey)
+        return model{spinner: s, url: url}
+}</span>
+
+func (m model) Init() tea.Cmd <span class="cov0" title="0">{
+        return tea.Batch(m.checkServer, m.spinner.Tick)
+}</span>
+
+func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) <span class="cov0" title="0">{
+        switch msg := msg.(type) </span>{
+        case tea.KeyMsg:<span class="cov0" title="0">
+                switch msg.String() </span>{
+                case "q", "esc", "ctrl+c":<span class="cov0" title="0">
+                        m.quitting = true
+                        return m, tea.Quit</span>
+                default:<span class="cov0" title="0">
+                        return m, nil</span>
+                }
+
+        case responseMsg:<span class="cov0" title="0">
+                return m, nil</span>
+        case errMsg:<span class="cov0" title="0">
+                m.err = msg
+                return m, nil</span>
+
+        default:<span class="cov0" title="0">
+                var cmd tea.Cmd
+                m.spinner, cmd = m.spinner.Update(msg)
+                return m, cmd</span>
+        }
+}
+
+func (m model) View() string <span class="cov0" title="0">{
+        if m.err != nil </span><span class="cov0" title="0">{
+                return m.err.Error()
+        }</span>
+        <span class="cov0" title="0">str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
+        if m.quitting </span><span class="cov0" title="0">{
+                return str + "\n"
+        }</span>
+        <span class="cov0" title="0">return str</span>
+}
+
+func (m model) checkServer() tea.Msg <span class="cov0" title="0">{
+        // body, _ := preflight.read.ReadHttpFile(m.url)
+        // return responseMsg(body)
+        return responseMsg([]byte{})
+}</span>
+
+func LoadHttpFileProgram(url string) *tea.Program <span class="cov0" title="0">{
+        return tea.NewProgram(initialModel(url))
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package render
+
+import (
+        "fmt"
+        domain "preflight/src/domain"
+        "strings"
+
+        "github.com/charmbracelet/bubbles/spinner"
+)
+
+func RenderSystemCheck(s domain.SystemCheck, active bool, spinner spinner.Model) string <span class="cov8" title="1">{
+        icon := pkgNameStyle.Render("-")
+        checkName := pkgNameStyle.Render(s.Name)
+
+        if active </span><span class="cov8" title="1">{
+                icon = spinner.View()
+                checkName = currentPkgNameStyle.Render(s.Name)
+        }</span>
+
+        <span class="cov8" title="1">return fmt.Sprintf("%s %s\n", icon, checkName)</span>
+}
+
+func RenderResultFor(s domain.SystemCheck) string <span class="cov8" title="1">{
+        icon := checkMark.String()
+        name := checkMark.Render(s.Name)
+        desc := strings.Builder{}
+
+        if !s.Check </span><span class="cov8" title="1">{
+                style := koMark
+                if s.Optional </span><span class="cov8" title="1">{
+                        style = warningMark
+                }</span>
+                <span class="cov8" title="1">icon = style.String()
+                name = style.Render(s.Name)
+                desc.WriteString(fmt.Sprintf("\n\t%s", s.Description))
+                for _, checkpoint := range s.Checkpoints </span><span class="cov8" title="1">{
+                        desc.WriteString(fmt.Sprintf("\n\t%s\t%s", checkpoint.Name, checkpoint.Documentation))
+                }</span>
+        }
+
+        <span class="cov8" title="1">return fmt.Sprintf("%s %s%s", icon, name, pkgNameStyle.Render(desc.String()))</span>
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package preflight
+
+import (
+        "fmt"
+        domain "preflight/src/domain"
+        "preflight/src/render"
         "strings"
 
         "github.com/charmbracelet/bubbles/progress"
@@ -240,7 +376,7 @@ var (
         greetings = lipgloss.NewStyle().Foreground(ocean).SetString("Checking preflight conditions:\n")
 )
 
-func InitPreflightModel(systemCheck []SystemCheck) PreflightModel <span class="cov8" title="1">{
+func InitPreflightModel(systemCheck []domain.SystemCheck) PreflightModel <span class="cov8" title="1">{
         fmt.Println(greetings.String())
         p := progress.New(
                 progress.WithGradient(string(ocean), string(white)),
@@ -294,13 +430,13 @@ func (p PreflightModel) View() string <span class="cov8" title="1">{
         view := strings.Builder{}
 
         if p.done </span><span class="cov8" title="1">{
-                view.WriteString(p.checks[len(p.checks)-1].RenderResult())
+                view.WriteString(render.RenderResultFor(p.checks[len(p.checks)-1]))
                 view.WriteString(p.RenderConclusion())
                 return view.String()
         }</span>
 
         <span class="cov8" title="1">for i := p.activeIndex; i &lt; len(p.checks); i++ </span><span class="cov8" title="1">{
-                view.WriteString(p.checks[i].Render(i == p.activeIndex, p.spinner))
+                view.WriteString(render.RenderSystemCheck(p.checks[i], i == p.activeIndex, p.spinner))
         }</span>
         <span class="cov8" title="1">view.WriteString("\n")
         view.WriteString(p.progress.View())
@@ -309,74 +445,7 @@ func (p PreflightModel) View() string <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file3" style="display: none">package preflight
-
-import (
-        "fmt"
-        "strings"
-
-        "github.com/charmbracelet/bubbles/spinner"
-        "github.com/charmbracelet/lipgloss"
-)
-
-type Checkpoint struct {
-        Name           string `yaml:"name"`
-        Command        string `yaml:"command"`
-        Documentation  string `yaml:"documentation"`
-        UseInteractive bool   `yaml:"use_interactive"`
-}
-
-type SystemCheck struct {
-        Name        string       `yaml:"name"`
-        Description string       `yaml:"description"`
-        Optional    bool         `yaml:"optional"`
-        Checkpoints []Checkpoint `yaml:"checkpoints"`
-        Check       bool
-}
-
-var (
-        currentPkgNameStyle = lipgloss.NewStyle().Foreground(honey)
-        pkgNameStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("242"))
-        checkMark           = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
-        warningMark         = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("!")
-        koMark              = lipgloss.NewStyle().Foreground(lipgloss.Color("197")).SetString("✕")
-)
-
-func (s SystemCheck) Render(active bool, spinner spinner.Model) string <span class="cov8" title="1">{
-        icon := pkgNameStyle.Render("-")
-        checkName := pkgNameStyle.Render(s.Name)
-
-        if active </span><span class="cov8" title="1">{
-                icon = spinner.View()
-                checkName = currentPkgNameStyle.Render(s.Name)
-        }</span>
-
-        <span class="cov8" title="1">return fmt.Sprintf("%s %s\n", icon, checkName)</span>
-}
-
-func (s SystemCheck) RenderResult() string <span class="cov8" title="1">{
-        icon := checkMark.String()
-        name := checkMark.Render(s.Name)
-        desc := strings.Builder{}
-
-        if !s.Check </span><span class="cov8" title="1">{
-                style := koMark
-                if s.Optional </span><span class="cov8" title="1">{
-                        style = warningMark
-                }</span>
-                <span class="cov8" title="1">icon = style.String()
-                name = style.Render(s.Name)
-                desc.WriteString(fmt.Sprintf("\n\t%s", s.Description))
-                for _, checkpoint := range s.Checkpoints </span><span class="cov8" title="1">{
-                        desc.WriteString(fmt.Sprintf("\n\t%s\t%s", checkpoint.Name, checkpoint.Documentation))
-                }</span>
-        }
-
-        <span class="cov8" title="1">return fmt.Sprintf("%s %s%s", icon, name, pkgNameStyle.Render(desc.String()))</span>
-}
-</pre>
-		
-		<pre class="file" id="file4" style="display: none">package preflight
+		<pre class="file" id="file5" style="display: none">package preflight
 
 import (
         "fmt"
