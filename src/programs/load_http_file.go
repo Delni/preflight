@@ -1,8 +1,10 @@
-package render
+package programs
 
 import (
 	"fmt"
+	"preflight/src/io"
 	"preflight/src/styles"
+	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -13,25 +15,26 @@ type responseMsg []byte
 
 type errMsg struct{ error }
 
-type model struct {
+type LoadOverHttpModel struct {
 	url      string
 	spinner  spinner.Model
+	Body     []byte
 	quitting bool
 	err      error
 }
 
-func initialModel(url string) model {
+func initialModel(url string) LoadOverHttpModel {
 	s := spinner.New()
 	s.Spinner = spinner.MiniDot
 	s.Style = lipgloss.NewStyle().Foreground(styles.Honey)
-	return model{spinner: s, url: url}
+	return LoadOverHttpModel{spinner: s, url: url}
 }
 
-func (m model) Init() tea.Cmd {
+func (m LoadOverHttpModel) Init() tea.Cmd {
 	return tea.Batch(m.checkServer, m.spinner.Tick)
 }
 
-func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+func (m LoadOverHttpModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
@@ -43,33 +46,46 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case responseMsg:
-		return m, nil
+		m.Body = msg
+		return m, tea.Quit
 	case errMsg:
 		m.err = msg
-		return m, nil
+		return m, tea.Tick(time.Duration(2*time.Second), func(t time.Time) tea.Msg {
+			m.quitting = true
+			return nil
+		})
 
 	default:
 		var cmd tea.Cmd
 		m.spinner, cmd = m.spinner.Update(msg)
+		if m.quitting {
+			return m, tea.Quit
+		}
+
 		return m, cmd
 	}
 }
 
-func (m model) View() string {
+func (m LoadOverHttpModel) View() string {
+	str := fmt.Sprintf("%s Fetching file from %s...\n", m.spinner.View(), m.url)
 	if m.err != nil {
 		return m.err.Error()
 	}
-	str := fmt.Sprintf("\n\n   %s Loading forever...press q to quit\n\n", m.spinner.View())
 	if m.quitting {
-		return str + "\n"
+		return str + string(m.err.Error()) + "\n"
+	}
+	if len(m.Body) != 0 {
+		return string(m.Body)
 	}
 	return str
 }
 
-func (m model) checkServer() tea.Msg {
-	// body, _ := preflight.read.ReadHttpFile(m.url)
-	// return responseMsg(body)
-	return responseMsg([]byte{})
+func (m LoadOverHttpModel) checkServer() tea.Msg {
+	body, err := io.ReadHttpFile(m.url)
+	if err != nil {
+		return errMsg{err}
+	}
+	return responseMsg(body)
 }
 
 func LoadHttpFileProgram(url string) *tea.Program {
