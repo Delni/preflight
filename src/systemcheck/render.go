@@ -2,33 +2,33 @@ package systemcheck
 
 import (
 	"fmt"
-	"preflight/src/render"
+	"preflight/src/styles"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/spinner"
 )
 
 func (s SystemCheck) RenderSystemCheck(active bool, spinner spinner.Model) string {
-	icon := render.PkgNameStyle.Render("-")
-	checkName := render.PkgNameStyle.Render(s.Name)
+	icon := styles.PkgNameStyle.Render("-")
+	checkName := styles.PkgNameStyle.Render(s.Name)
 
 	if active {
 		icon = spinner.View()
-		checkName = render.CurrentPkgNameStyle.Render(s.Name)
+		checkName = styles.CurrentPkgNameStyle.Render(s.Name)
 	}
 
 	return fmt.Sprintf("%s %s\n", icon, checkName)
 }
 
 func (s SystemCheck) RenderResult() string {
-	icon := render.CheckMark.String()
-	name := render.CheckMark.Render(s.Name)
+	icon := styles.CheckMark.String()
+	name := styles.CheckMark.Render(s.Name)
 	desc := strings.Builder{}
 
 	if !s.Check {
-		style := render.KoMark
+		style := styles.KoMark
 		if s.Optional {
-			style = render.WarningMark
+			style = styles.WarningMark
 		}
 		icon = style.String()
 		name = style.Render(s.Name)
@@ -38,5 +38,5 @@ func (s SystemCheck) RenderResult() string {
 		}
 	}
 
-	return fmt.Sprintf("%s %s%s", icon, name, render.PkgNameStyle.Render(desc.String()))
+	return fmt.Sprintf("%s %s%s", icon, name, styles.PkgNameStyle.Render(desc.String()))
 }

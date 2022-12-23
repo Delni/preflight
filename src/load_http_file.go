@@ -2,6 +2,7 @@ package render
 
 import (
 	"fmt"
+	"preflight/src/styles"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -22,7 +23,7 @@ type model struct {
 func initialModel(url string) model {
 	s := spinner.New()
 	s.Spinner = spinner.MiniDot
-	s.Style = lipgloss.NewStyle().Foreground(Honey)
+	s.Style = lipgloss.NewStyle().Foreground(styles.Honey)
 	return model{spinner: s, url: url}
 }
 

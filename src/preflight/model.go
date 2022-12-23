@@ -2,7 +2,7 @@ package preflight
 
 import (
 	"fmt"
-	"preflight/src/render"
+	"preflight/src/styles"
 	"preflight/src/systemcheck"
 
 	"github.com/charmbracelet/bubbles/progress"
@@ -27,13 +27,13 @@ func (p PreflightModel) getActiveCheckpoint() systemcheck.Checkpoint {
 }
 
 func InitPreflightModel(systemCheck []systemcheck.SystemCheck) PreflightModel {
-	fmt.Println(render.Greetings.String())
+	fmt.Println(styles.Greetings.String())
 	p := progress.New(
-		progress.WithGradient(string(render.Ocean), string(render.White)),
+		progress.WithGradient(string(styles.Ocean), string(styles.White)),
 	)
 	s := spinner.New()
 	s.Spinner = spinner.Jump
-	s.Style = lipgloss.NewStyle().Foreground(render.Honey)
+	s.Style = lipgloss.NewStyle().Foreground(styles.Honey)
 	return PreflightModel{
 		checks:   systemCheck,
 		spinner:  s,
