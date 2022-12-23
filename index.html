@@ -172,7 +172,7 @@ func ReadChecklist(checklist []byte) ([]systemcheck.SystemCheck, error) <span cl
 
 import (
         "fmt"
-        "preflight/src/render"
+        "preflight/src/styles"
         "preflight/src/systemcheck"
 
         "github.com/charmbracelet/bubbles/progress"
@@ -197,13 +197,13 @@ func (p PreflightModel) getActiveCheckpoint() systemcheck.Checkpoint <span class
 }</span>
 
 func InitPreflightModel(systemCheck []systemcheck.SystemCheck) PreflightModel <span class="cov8" title="1">{
-        fmt.Println(render.Greetings.String())
+        fmt.Println(styles.Greetings.String())
         p := progress.New(
-                progress.WithGradient(string(render.Ocean), string(render.White)),
+                progress.WithGradient(string(styles.Ocean), string(styles.White)),
         )
         s := spinner.New()
         s.Spinner = spinner.Jump
-        s.Style = lipgloss.NewStyle().Foreground(render.Honey)
+        s.Style = lipgloss.NewStyle().Foreground(styles.Honey)
         return PreflightModel{
                 checks:   systemCheck,
                 spinner:  s,
@@ -277,7 +277,7 @@ func (p PreflightModel) View() string <span class="cov8" title="1">{
 		
 		<pre class="file" id="file4" style="display: none">package preflight
 
-import "preflight/src/render"
+import "preflight/src/styles"
 
 func (p PreflightModel) RenderConclusion() string <span class="cov8" title="1">{
         hasFail := false
@@ -294,14 +294,14 @@ func (p PreflightModel) RenderConclusion() string <span class="cov8" title="1">{
         }
 
         <span class="cov8" title="1">if hasFail </span><span class="cov8" title="1">{
-                return render.KoMark.Render("\n\n No go, no go! Check above for more details. 🛬\n")
+                return styles.KoMark.Render("\n\n No go, no go! Check above for more details. 🛬\n")
         }</span>
 
         <span class="cov8" title="1">if hasWarning </span><span class="cov8" title="1">{
-                return render.WarningMark.Render("\n\n You're good to go, but check above, some checks were unsuccessful 🎫\n")
+                return styles.WarningMark.Render("\n\n You're good to go, but check above, some checks were unsuccessful 🎫\n")
         }</span>
 
-        <span class="cov8" title="1">return render.CheckMark.Render("\n\nDone! You're good to go 🛫\n")</span>
+        <span class="cov8" title="1">return styles.CheckMark.Render("\n\nDone! You're good to go 🛫\n")</span>
 }
 </pre>
 		
@@ -372,33 +372,33 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
 
 import (
         "fmt"
-        "preflight/src/render"
+        "preflight/src/styles"
         "strings"
 
         "github.com/charmbracelet/bubbles/spinner"
 )
 
 func (s SystemCheck) RenderSystemCheck(active bool, spinner spinner.Model) string <span class="cov8" title="1">{
-        icon := render.PkgNameStyle.Render("-")
-        checkName := render.PkgNameStyle.Render(s.Name)
+        icon := styles.PkgNameStyle.Render("-")
+        checkName := styles.PkgNameStyle.Render(s.Name)
 
         if active </span><span class="cov8" title="1">{
                 icon = spinner.View()
-                checkName = render.CurrentPkgNameStyle.Render(s.Name)
+                checkName = styles.CurrentPkgNameStyle.Render(s.Name)
         }</span>
 
         <span class="cov8" title="1">return fmt.Sprintf("%s %s\n", icon, checkName)</span>
 }
 
 func (s SystemCheck) RenderResult() string <span class="cov8" title="1">{
-        icon := render.CheckMark.String()
-        name := render.CheckMark.Render(s.Name)
+        icon := styles.CheckMark.String()
+        name := styles.CheckMark.Render(s.Name)
         desc := strings.Builder{}
 
         if !s.Check </span><span class="cov8" title="1">{
-                style := render.KoMark
+                style := styles.KoMark
                 if s.Optional </span><span class="cov8" title="1">{
-                        style = render.WarningMark
+                        style = styles.WarningMark
                 }</span>
                 <span class="cov8" title="1">icon = style.String()
                 name = style.Render(s.Name)
@@ -408,7 +408,7 @@ func (s SystemCheck) RenderResult() string <span class="cov8" title="1">{
                 }</span>
         }
 
-        <span class="cov8" title="1">return fmt.Sprintf("%s %s%s", icon, name, render.PkgNameStyle.Render(desc.String()))</span>
+        <span class="cov8" title="1">return fmt.Sprintf("%s %s%s", icon, name, styles.PkgNameStyle.Render(desc.String()))</span>
 }
 </pre>
 		
