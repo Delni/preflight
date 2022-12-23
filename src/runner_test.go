@@ -17,7 +17,7 @@ func TestPreflightModel(t *testing.T) {
 }
 
 func TestViewOnGoing(t *testing.T) {
-	p := FakePreflightModel()
+	p := fakePreflightModel()
 
 	ans := p.View()
 
@@ -26,7 +26,7 @@ func TestViewOnGoing(t *testing.T) {
 }
 
 func TestViewDone(t *testing.T) {
-	p := FakePreflightModel()
+	p := fakePreflightModel()
 	p.done = true
 
 	ans := p.View()
