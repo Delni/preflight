@@ -1,38 +1,12 @@
 package preflight
 
 import (
-	"fmt"
-	domain "preflight/src/domain"
 	"preflight/src/render"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/progress"
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
-
-var (
-	honey     = lipgloss.Color("#febe3c")
-	ocean     = lipgloss.Color("#1686cb")
-	white     = lipgloss.Color("#ffffff")
-	greetings = lipgloss.NewStyle().Foreground(ocean).SetString("Checking preflight conditions:\n")
-)
-
-func InitPreflightModel(systemCheck []domain.SystemCheck) PreflightModel {
-	fmt.Println(greetings.String())
-	p := progress.New(
-		progress.WithGradient(string(ocean), string(white)),
-	)
-	s := spinner.New()
-	s.Spinner = spinner.Jump
-	s.Style = lipgloss.NewStyle().Foreground(honey)
-	return PreflightModel{
-		checks:   systemCheck,
-		spinner:  s,
-		progress: p,
-	}
-}
 
 func (p PreflightModel) Init() tea.Cmd {
 	return tea.Batch(

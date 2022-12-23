@@ -4,33 +4,13 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"preflight/src/domain"
 	"preflight/src/io"
 	"preflight/src/render"
 	"runtime"
 	"time"
 
-	"github.com/charmbracelet/bubbles/progress"
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
-
-type PreflightModel struct {
-	checks                []domain.SystemCheck
-	spinner               spinner.Model
-	progress              progress.Model
-	activeIndex           int
-	activeCheckpointIndex int
-	done                  bool
-}
-
-func (p PreflightModel) getActive() *domain.SystemCheck {
-	return &p.checks[p.activeIndex]
-}
-func (p PreflightModel) getActiveCheckpoint() domain.Checkpoint {
-	return p.getActive().Checkpoints[p.activeCheckpointIndex]
-}
 
 type systemCheckMsg struct{ check bool }
 
@@ -79,35 +59,4 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
 		)
 	}
 	return p, p.runCheckpoint()
-}
-
-var (
-	checkMark   = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
-	warningMark = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("!")
-	koMark      = lipgloss.NewStyle().Foreground(lipgloss.Color("197")).SetString("✕")
-)
-
-func (p PreflightModel) RenderConclusion() string {
-	hasFail := false
-	hasWarning := false
-	for _, systemCheck := range p.checks {
-		if !systemCheck.Check {
-			if systemCheck.Optional {
-				hasWarning = true
-			} else {
-				hasFail = true
-				break
-			}
-		}
-	}
-
-	if hasFail {
-		return koMark.Render("\n\n No go, no go! Check above for more details. 🛬\n")
-	}
-
-	if hasWarning {
-		return warningMark.Render("\n\n You're good to go, but check above, some checks were unsuccessful 🎫\n")
-	}
-
-	return checkMark.Render("\n\nDone! You're good to go 🛫\n")
 }

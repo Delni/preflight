@@ -9,26 +9,26 @@ import (
 )
 
 func RenderSystemCheck(s domain.SystemCheck, active bool, spinner spinner.Model) string {
-	icon := pkgNameStyle.Render("-")
-	checkName := pkgNameStyle.Render(s.Name)
+	icon := PkgNameStyle.Render("-")
+	checkName := PkgNameStyle.Render(s.Name)
 
 	if active {
 		icon = spinner.View()
-		checkName = currentPkgNameStyle.Render(s.Name)
+		checkName = CurrentPkgNameStyle.Render(s.Name)
 	}
 
 	return fmt.Sprintf("%s %s\n", icon, checkName)
 }
 
 func RenderResultFor(s domain.SystemCheck) string {
-	icon := checkMark.String()
-	name := checkMark.Render(s.Name)
+	icon := CheckMark.String()
+	name := CheckMark.Render(s.Name)
 	desc := strings.Builder{}
 
 	if !s.Check {
-		style := koMark
+		style := KoMark
 		if s.Optional {
-			style = warningMark
+			style = WarningMark
 		}
 		icon = style.String()
 		name = style.Render(s.Name)
@@ -38,5 +38,5 @@ func RenderResultFor(s domain.SystemCheck) string {
 		}
 	}
 
-	return fmt.Sprintf("%s %s%s", icon, name, pkgNameStyle.Render(desc.String()))
+	return fmt.Sprintf("%s %s%s", icon, name, PkgNameStyle.Render(desc.String()))
 }

@@ -1,8 +1,6 @@
 package preflight
 
 import (
-	domain "preflight/src/domain"
-	"reflect"
 	"strings"
 	"testing"
 )
@@ -14,20 +12,8 @@ func assertMultipleContains(t *testing.T, ans string, want []string) {
 		}
 	}
 }
-
-func TestPreflightModel(t *testing.T) {
-	s := fakeSystemCheck()
-
-	ans := InitPreflightModel([]domain.SystemCheck{s})
-	check := ans.checks[0]
-
-	if !reflect.DeepEqual(check, s) {
-		t.Errorf("got %+v, want %+v", check, s)
-	}
-}
-
 func TestViewOnGoing(t *testing.T) {
-	p := fakePreflightModel()
+	p := makeTestModel()
 
 	ans := p.View()
 
@@ -36,7 +22,7 @@ func TestViewOnGoing(t *testing.T) {
 }
 
 func TestViewDone(t *testing.T) {
-	p := fakePreflightModel()
+	p := makeTestModel()
 	p.done = true
 
 	ans := p.View()

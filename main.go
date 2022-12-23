@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	preflight "preflight/src"
 	io "preflight/src/io"
+	preflight "preflight/src/preflight"
 	"sort"
 
 	tea "github.com/charmbracelet/bubbletea"

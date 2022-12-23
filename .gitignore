@@ -1,10 +1,10 @@
 checklists
 !checklists/demo.yaml
 
-# MacOS
 .DS_Store
 
 # ignore generated files
 bin
 preflight
+!src/preflight
 coverage.out
