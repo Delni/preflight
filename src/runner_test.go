@@ -1,14 +1,24 @@
 package preflight
 
 import (
+	domain "preflight/src/domain"
 	"reflect"
+	"strings"
 	"testing"
 )
+
+func assertMultipleContains(t *testing.T, ans string, want []string) {
+	for _, s := range want {
+		if !strings.Contains(ans, s) {
+			t.Errorf("%s should contain %s", ans, s)
+		}
+	}
+}
 
 func TestPreflightModel(t *testing.T) {
 	s := fakeSystemCheck()
 
-	ans := InitPreflightModel([]SystemCheck{s})
+	ans := InitPreflightModel([]domain.SystemCheck{s})
 	check := ans.checks[0]
 
 	if !reflect.DeepEqual(check, s) {

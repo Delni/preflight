@@ -2,6 +2,8 @@ package preflight
 
 import (
 	"fmt"
+	domain "preflight/src/domain"
+	"preflight/src/render"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/progress"
@@ -17,7 +19,7 @@ var (
 	greetings = lipgloss.NewStyle().Foreground(ocean).SetString("Checking preflight conditions:\n")
 )
 
-func InitPreflightModel(systemCheck []SystemCheck) PreflightModel {
+func InitPreflightModel(systemCheck []domain.SystemCheck) PreflightModel {
 	fmt.Println(greetings.String())
 	p := progress.New(
 		progress.WithGradient(string(ocean), string(white)),
@@ -71,13 +73,13 @@ func (p PreflightModel) View() string {
 	view := strings.Builder{}
 
 	if p.done {
-		view.WriteString(p.checks[len(p.checks)-1].RenderResult())
+		view.WriteString(render.RenderResultFor(p.checks[len(p.checks)-1]))
 		view.WriteString(p.RenderConclusion())
 		return view.String()
 	}
 
 	for i := p.activeIndex; i < len(p.checks); i++ {
-		view.WriteString(p.checks[i].Render(i == p.activeIndex, p.spinner))
+		view.WriteString(render.RenderSystemCheck(p.checks[i], i == p.activeIndex, p.spinner))
 	}
 	view.WriteString("\n")
 	view.WriteString(p.progress.View())

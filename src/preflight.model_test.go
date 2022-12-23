@@ -4,12 +4,31 @@ import (
 	"strings"
 	"testing"
 
+	domain "preflight/src/domain"
+
 	"github.com/charmbracelet/bubbles/progress"
+	"github.com/charmbracelet/bubbles/spinner"
 )
+
+func fakeSystemCheck() domain.SystemCheck {
+	return domain.SystemCheck{
+		Name:        "SYSTEM_CHECK",
+		Description: "DESCRIPTION",
+		Optional:    false,
+		Checkpoints: []domain.Checkpoint{
+			{Name: "CHECKPOINT", Command: "CMD", Documentation: "DOC", UseInteractive: true},
+		},
+		Check: false,
+	}
+}
+
+func fakeSpinner() spinner.Model {
+	return spinner.New()
+}
 
 func fakePreflightModel() PreflightModel {
 	return PreflightModel{
-		checks:                []SystemCheck{fakeSystemCheck()},
+		checks:                []domain.SystemCheck{fakeSystemCheck()},
 		spinner:               fakeSpinner(),
 		progress:              fakeProgress(),
 		activeIndex:           0,

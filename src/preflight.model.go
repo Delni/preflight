@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	domain "preflight/src/domain"
+	"preflight/src/render"
 	"runtime"
 	"time"
 
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type PreflightModel struct {
-	checks                []SystemCheck
+	checks                []domain.SystemCheck
 	spinner               spinner.Model
 	progress              progress.Model
 	activeIndex           int
@@ -21,10 +24,10 @@ type PreflightModel struct {
 	done                  bool
 }
 
-func (p PreflightModel) getActive() *SystemCheck {
+func (p PreflightModel) getActive() *domain.SystemCheck {
 	return &p.checks[p.activeIndex]
 }
-func (p PreflightModel) getActiveCheckpoint() Checkpoint {
+func (p PreflightModel) getActiveCheckpoint() domain.Checkpoint {
 	return p.getActive().Checkpoints[p.activeCheckpointIndex]
 }
 
@@ -56,7 +59,7 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
 	if msg.check {
 		p.getActive().Check = msg.check
 	}
-	result := p.getActive().RenderResult()
+	result := render.RenderResultFor(*p.getActive())
 	if p.activeCheckpointIndex >= len(p.getActive().Checkpoints) {
 		p.activeCheckpointIndex = 0
 		p.activeIndex++
@@ -76,6 +79,12 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
 	}
 	return p, p.runCheckpoint()
 }
+
+var (
+	checkMark   = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
+	warningMark = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("!")
+	koMark      = lipgloss.NewStyle().Foreground(lipgloss.Color("197")).SetString("✕")
+)
 
 func (p PreflightModel) RenderConclusion() string {
 	hasFail := false

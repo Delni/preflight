@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	domain "preflight/src/domain"
 	"reflect"
 	"strings"
 	"testing"
@@ -12,7 +13,7 @@ import (
 )
 
 func fakeYamlSystemCheckBytes() []byte {
-	data := []SystemCheck{fakeSystemCheck()}
+	data := []domain.SystemCheck{fakeSystemCheck()}
 	dataBytes, err := yaml.Marshal(&data)
 	if err != nil {
 		log.Fatal(err)
@@ -46,7 +47,7 @@ func TestReadChecklist(t *testing.T) {
 		t.Errorf("got error %s when reading check list: ", err.Error())
 	}
 
-	want := []SystemCheck{fakeSystemCheck()}
+	want := []domain.SystemCheck{fakeSystemCheck()}
 	if !reflect.DeepEqual(systemCheck, want) {
 		t.Errorf("got %+v, want %+v", systemCheck, want)
 	}
