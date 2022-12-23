@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>src: Go Coverage Report</title>
+		<title>io: Go Coverage Report</title>
 		<style>
 			body {
 				background: black;
@@ -55,17 +55,17 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">preflight/src/preflight.model.go (85.7%)</option>
+				<option value="file0">preflight/src/io/os_interpreter.go (100.0%)</option>
 				
-				<option value="file1">preflight/src/reader.go (46.7%)</option>
+				<option value="file1">preflight/src/io/reader.go (46.7%)</option>
 				
-				<option value="file2">preflight/src/render/load_http_file.go (0.0%)</option>
+				<option value="file2">preflight/src/preflight.model.go (85.7%)</option>
 				
-				<option value="file3">preflight/src/render/system_check.go (100.0%)</option>
+				<option value="file3">preflight/src/render/load_http_file.go (0.0%)</option>
 				
-				<option value="file4">preflight/src/runner.go (53.3%)</option>
+				<option value="file4">preflight/src/render/system_check.go (100.0%)</option>
 				
-				<option value="file5">preflight/src/utils.go (100.0%)</option>
+				<option value="file5">preflight/src/runner.go (53.3%)</option>
 				
 				</select>
 			</div>
@@ -79,13 +79,100 @@
 		</div>
 		<div id="content">
 		
-		<pre class="file" id="file0" style="display: none">package preflight
+		<pre class="file" id="file0" style="display: none">package io
+
+import (
+        "fmt"
+)
+
+type OSInterpreter struct {
+        Interpreter                string
+        InterpreterArgs            string
+        InterpreterInteractiveArgs string
+        Command                    string
+        CommandArgs                string
+}
+
+func GetInterpreterCommand(os string) (OSInterpreter, error) <span class="cov8" title="1">{
+        switch os </span>{
+        case "windows":<span class="cov8" title="1">
+                return OSInterpreter{
+                        Interpreter:                "powershell.exe",
+                        InterpreterArgs:            "",
+                        InterpreterInteractiveArgs: "",
+                        Command:                    "command",
+                        CommandArgs:                "",
+                }, nil</span>
+        case "darwin":<span class="cov8" title="1">
+                return OSInterpreter{
+                        Interpreter:                "bash",
+                        InterpreterArgs:            "-c",
+                        InterpreterInteractiveArgs: "-ic",
+                        Command:                    "command",
+                        CommandArgs:                "-v",
+                }, nil</span>
+        case "linux":<span class="cov8" title="1">
+                return OSInterpreter{
+                        Interpreter:                "bash",
+                        InterpreterArgs:            "-c",
+                        InterpreterInteractiveArgs: "-ic",
+                        Command:                    "command",
+                        CommandArgs:                "-v",
+                }, nil</span>
+        default:<span class="cov8" title="1">
+                return OSInterpreter{}, fmt.Errorf("OS %s is not currently supported", os)</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package io
+
+import (
+        "io"
+        "io/ioutil"
+        "net/http"
+        domain "preflight/src/domain"
+
+        "gopkg.in/yaml.v3"
+)
+
+func ReadFile(path string) ([]byte, error) <span class="cov8" title="1">{
+        buf, err := ioutil.ReadFile(path)
+        return buf, err
+}</span>
+
+func ReadHttpFile(path string) ([]byte, error) <span class="cov0" title="0">{
+        resp, err := http.Get(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return []byte{}, err
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+        body, err := io.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return []byte{}, err
+        }</span>
+        <span class="cov0" title="0">return body, nil</span>
+}
+
+func ReadChecklist(checklist []byte) ([]domain.SystemCheck, error) <span class="cov8" title="1">{
+        data := []domain.SystemCheck{}
+        err := yaml.Unmarshal(checklist, &amp;data)
+        if err != nil </span><span class="cov8" title="1">{
+                return []domain.SystemCheck{}, err
+        }</span>
+
+        <span class="cov8" title="1">return data, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package preflight
 
 import (
         "fmt"
         "os"
         "os/exec"
-        domain "preflight/src/domain"
+        "preflight/src/domain"
+        "preflight/src/io"
         "preflight/src/render"
         "runtime"
         "time"
@@ -116,7 +203,7 @@ type systemCheckMsg struct{ check bool }
 
 func (p PreflightModel) runCheckpoint() tea.Cmd <span class="cov8" title="1">{
         checkpoint := p.getActiveCheckpoint()
-        interpreter, err := GetInterpreterCommand(runtime.GOOS)
+        interpreter, err := io.GetInterpreterCommand(runtime.GOOS)
         if err != nil </span><span class="cov0" title="0">{
                 fmt.Println(err)
                 os.Exit(1)
@@ -193,47 +280,7 @@ func (p PreflightModel) RenderConclusion() string <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file1" style="display: none">package preflight
-
-import (
-        "io"
-        "io/ioutil"
-        "net/http"
-        domain "preflight/src/domain"
-
-        "gopkg.in/yaml.v3"
-)
-
-func ReadFile(path string) ([]byte, error) <span class="cov8" title="1">{
-        buf, err := ioutil.ReadFile(path)
-        return buf, err
-}</span>
-
-func ReadHttpFile(path string) ([]byte, error) <span class="cov0" title="0">{
-        resp, err := http.Get(path)
-        if err != nil </span><span class="cov0" title="0">{
-                return []byte{}, err
-        }</span>
-        <span class="cov0" title="0">defer resp.Body.Close()
-        body, err := io.ReadAll(resp.Body)
-        if err != nil </span><span class="cov0" title="0">{
-                return []byte{}, err
-        }</span>
-        <span class="cov0" title="0">return body, nil</span>
-}
-
-func ReadChecklist(checklist []byte) ([]domain.SystemCheck, error) <span class="cov8" title="1">{
-        data := []domain.SystemCheck{}
-        err := yaml.Unmarshal(checklist, &amp;data)
-        if err != nil </span><span class="cov8" title="1">{
-                return []domain.SystemCheck{}, err
-        }</span>
-
-        <span class="cov8" title="1">return data, nil</span>
-}
-</pre>
-		
-		<pre class="file" id="file2" style="display: none">package render
+		<pre class="file" id="file3" style="display: none">package render
 
 import (
         "fmt"
@@ -311,7 +358,7 @@ func LoadHttpFileProgram(url string) *tea.Program <span class="cov0" title="0">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file3" style="display: none">package render
+		<pre class="file" id="file4" style="display: none">package render
 
 import (
         "fmt"
@@ -355,7 +402,7 @@ func RenderResultFor(s domain.SystemCheck) string <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package preflight
+		<pre class="file" id="file5" style="display: none">package preflight
 
 import (
         "fmt"
@@ -442,52 +489,6 @@ func (p PreflightModel) View() string <span class="cov8" title="1">{
         view.WriteString(p.progress.View())
 
         return view.String()</span>
-}
-</pre>
-		
-		<pre class="file" id="file5" style="display: none">package preflight
-
-import (
-        "fmt"
-)
-
-type OSInterpreter struct {
-        Interpreter                string
-        InterpreterArgs            string
-        InterpreterInteractiveArgs string
-        Command                    string
-        CommandArgs                string
-}
-
-func GetInterpreterCommand(os string) (OSInterpreter, error) <span class="cov8" title="1">{
-        switch os </span>{
-        case "windows":<span class="cov8" title="1">
-                return OSInterpreter{
-                        Interpreter:                "powershell.exe",
-                        InterpreterArgs:            "",
-                        InterpreterInteractiveArgs: "",
-                        Command:                    "command",
-                        CommandArgs:                "",
-                }, nil</span>
-        case "darwin":<span class="cov8" title="1">
-                return OSInterpreter{
-                        Interpreter:                "bash",
-                        InterpreterArgs:            "-c",
-                        InterpreterInteractiveArgs: "-ic",
-                        Command:                    "command",
-                        CommandArgs:                "-v",
-                }, nil</span>
-        case "linux":<span class="cov8" title="1">
-                return OSInterpreter{
-                        Interpreter:                "bash",
-                        InterpreterArgs:            "-c",
-                        InterpreterInteractiveArgs: "-ic",
-                        Command:                    "command",
-                        CommandArgs:                "-v",
-                }, nil</span>
-        default:<span class="cov8" title="1">
-                return OSInterpreter{}, fmt.Errorf("OS %s is not currently supported", os)</span>
-        }
 }
 </pre>
 		
