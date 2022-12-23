@@ -4,26 +4,27 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	domain "preflight/src/domain"
 	"reflect"
 	"strings"
 	"testing"
 
+	"preflight/src/systemcheck"
+
 	"gopkg.in/yaml.v3"
 )
 
-var testSystemCheck = domain.SystemCheck{
+var testSystemCheck = systemcheck.SystemCheck{
 	Name:        "SYSTEM_CHECK",
 	Description: "DESCRIPTION",
 	Optional:    false,
-	Checkpoints: []domain.Checkpoint{
+	Checkpoints: []systemcheck.Checkpoint{
 		{Name: "CHECKPOINT", Command: "CMD", Documentation: "DOC", UseInteractive: true},
 	},
 	Check: false,
 }
 
 func fakeYamlSystemCheckBytes() []byte {
-	data := []domain.SystemCheck{testSystemCheck}
+	data := []systemcheck.SystemCheck{testSystemCheck}
 	dataBytes, err := yaml.Marshal(&data)
 	if err != nil {
 		log.Fatal(err)
@@ -57,7 +58,7 @@ func TestReadChecklist(t *testing.T) {
 		t.Errorf("got error %s when reading check list: ", err.Error())
 	}
 
-	want := []domain.SystemCheck{testSystemCheck}
+	want := []systemcheck.SystemCheck{testSystemCheck}
 	if !reflect.DeepEqual(systemCheck, want) {
 		t.Errorf("got %+v, want %+v", systemCheck, want)
 	}
@@ -67,7 +68,7 @@ func TestReadChecklist(t *testing.T) {
 func TestReadChecklistMalformatedFile(t *testing.T) {
 	_, err := ReadChecklist([]byte("fake_yml"))
 
-	want := "cannot unmarshal !!str `fake_yml` into []domain.SystemCheck"
+	want := "cannot unmarshal !!str `fake_yml` into []systemcheck.SystemCheck"
 	if !strings.Contains(err.Error(), want) {
 		t.Errorf("got %+v, want %+v", err, want)
 	}

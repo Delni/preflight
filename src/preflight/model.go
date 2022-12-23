@@ -2,8 +2,8 @@ package preflight
 
 import (
 	"fmt"
-	"preflight/src/domain"
 	"preflight/src/render"
+	"preflight/src/systemcheck"
 
 	"github.com/charmbracelet/bubbles/progress"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -11,7 +11,7 @@ import (
 )
 
 type PreflightModel struct {
-	checks                []domain.SystemCheck
+	checks                []systemcheck.SystemCheck
 	spinner               spinner.Model
 	progress              progress.Model
 	activeIndex           int
@@ -19,14 +19,14 @@ type PreflightModel struct {
 	done                  bool
 }
 
-func (p PreflightModel) getActive() *domain.SystemCheck {
+func (p PreflightModel) getActive() *systemcheck.SystemCheck {
 	return &p.checks[p.activeIndex]
 }
-func (p PreflightModel) getActiveCheckpoint() domain.Checkpoint {
+func (p PreflightModel) getActiveCheckpoint() systemcheck.Checkpoint {
 	return p.getActive().Checkpoints[p.activeCheckpointIndex]
 }
 
-func InitPreflightModel(systemCheck []domain.SystemCheck) PreflightModel {
+func InitPreflightModel(systemCheck []systemcheck.SystemCheck) PreflightModel {
 	fmt.Println(render.Greetings.String())
 	p := progress.New(
 		progress.WithGradient(string(render.Ocean), string(render.White)),

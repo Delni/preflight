@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"preflight/src/io"
-	"preflight/src/render"
 	"runtime"
 	"time"
 
@@ -40,7 +39,7 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
 	if msg.check {
 		p.getActive().Check = msg.check
 	}
-	result := render.RenderResultFor(*p.getActive())
+	result := p.getActive().RenderResult()
 	if p.activeCheckpointIndex >= len(p.getActive().Checkpoints) {
 		p.activeCheckpointIndex = 0
 		p.activeIndex++

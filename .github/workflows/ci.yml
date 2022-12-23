@@ -19,7 +19,7 @@ jobs:
 
       - name: Test
         run: |
-          go test -v ./src/... -coverprofile=coverage.out
+          go test -v ./... -coverprofile=coverage.out
           mkdir coverage-report
           touch coverage-report/index.html
           go tool cover -html=coverage.out -o=coverage-report/index.html

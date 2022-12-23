@@ -1,4 +1,4 @@
-package domain
+package systemcheck
 
 type Checkpoint struct {
 	Name           string `yaml:"name"`

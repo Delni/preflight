@@ -1,7 +1,7 @@
 package preflight
 
 import (
-	"preflight/src/domain"
+	"preflight/src/systemcheck"
 	"reflect"
 	"testing"
 
@@ -9,11 +9,11 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 )
 
-var testSystemCheck = domain.SystemCheck{
+var testSystemCheck = systemcheck.SystemCheck{
 	Name:        "SYSTEM_CHECK",
 	Description: "DESCRIPTION",
 	Optional:    false,
-	Checkpoints: []domain.Checkpoint{
+	Checkpoints: []systemcheck.Checkpoint{
 		{Name: "CHECKPOINT", Command: "CMD", Documentation: "DOC", UseInteractive: true},
 	},
 	Check: false,
@@ -21,7 +21,7 @@ var testSystemCheck = domain.SystemCheck{
 
 func makeTestModel() PreflightModel {
 	return PreflightModel{
-		checks:                []domain.SystemCheck{testSystemCheck},
+		checks:                []systemcheck.SystemCheck{testSystemCheck},
 		spinner:               spinner.New(),
 		progress:              progress.New(),
 		activeIndex:           0,
@@ -80,7 +80,7 @@ func TestRunCheckpointSuccess(t *testing.T) {
 func TestInitPreflightModel(t *testing.T) {
 	s := testSystemCheck
 
-	ans := InitPreflightModel([]domain.SystemCheck{s})
+	ans := InitPreflightModel([]systemcheck.SystemCheck{s})
 	check := ans.checks[0]
 
 	if !reflect.DeepEqual(check, s) {

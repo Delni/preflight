@@ -1,20 +1,18 @@
-package render
+package systemcheck
 
 import (
 	"strings"
 	"testing"
 
-	domain "preflight/src/domain"
-
 	"github.com/charmbracelet/bubbles/spinner"
 )
 
-func fakeSystemCheck() domain.SystemCheck {
-	return domain.SystemCheck{
+func fakeSystemCheck() SystemCheck {
+	return SystemCheck{
 		Name:        "SYSTEM_CHECK",
 		Description: "DESCRIPTION",
 		Optional:    false,
-		Checkpoints: []domain.Checkpoint{
+		Checkpoints: []Checkpoint{
 			{Name: "CHECKPOINT", Command: "CMD", Documentation: "DOC", UseInteractive: true},
 		},
 		Check: false,
@@ -37,7 +35,7 @@ func TestRenderActive(t *testing.T) {
 	system := fakeSystemCheck()
 	spinner := fakeSpinner()
 
-	ans := RenderSystemCheck(system, true, spinner)
+	ans := system.RenderSystemCheck(true, spinner)
 
 	want := "| SYSTEM_CHECK\n"
 	if ans != want {
@@ -49,7 +47,7 @@ func TestRenderInactive(t *testing.T) {
 	system := fakeSystemCheck()
 	spinner := fakeSpinner()
 
-	ans := RenderSystemCheck(system, false, spinner)
+	ans := system.RenderSystemCheck(false, spinner)
 
 	want := "- SYSTEM_CHECK\n"
 	if ans != want {
@@ -60,7 +58,7 @@ func TestRenderInactive(t *testing.T) {
 func TestRenderResultUnchecked(t *testing.T) {
 	system := fakeSystemCheck()
 
-	ans := RenderResultFor(system)
+	ans := system.RenderResult()
 
 	want := []string{"✕", "SYSTEM_CHECK", "DESCRIPTION", "CHECKPOINT", "DOC"}
 	assertMultipleContains(t, ans, want)
@@ -70,7 +68,7 @@ func TestRenderResultUncheckedWarning(t *testing.T) {
 	system := fakeSystemCheck()
 	system.Optional = true
 
-	ans := RenderResultFor(system)
+	ans := system.RenderResult()
 
 	want := []string{"!", "SYSTEM_CHECK", "DESCRIPTION", "CHECKPOINT", "DOC"}
 	assertMultipleContains(t, ans, want)
@@ -80,7 +78,7 @@ func TestRenderResultChecked(t *testing.T) {
 	system := fakeSystemCheck()
 	system.Check = true
 
-	ans := RenderResultFor(system)
+	ans := system.RenderResult()
 
 	want := []string{"✓", "SYSTEM_CHECK"}
 	assertMultipleContains(t, ans, want)

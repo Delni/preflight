@@ -4,7 +4,8 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
-	domain "preflight/src/domain"
+
+	"preflight/src/systemcheck"
 
 	"gopkg.in/yaml.v3"
 )
@@ -27,11 +28,11 @@ func ReadHttpFile(path string) ([]byte, error) {
 	return body, nil
 }
 
-func ReadChecklist(checklist []byte) ([]domain.SystemCheck, error) {
-	data := []domain.SystemCheck{}
+func ReadChecklist(checklist []byte) ([]systemcheck.SystemCheck, error) {
+	data := []systemcheck.SystemCheck{}
 	err := yaml.Unmarshal(checklist, &data)
 	if err != nil {
-		return []domain.SystemCheck{}, err
+		return []systemcheck.SystemCheck{}, err
 	}
 
 	return data, nil
