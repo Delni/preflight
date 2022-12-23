@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	domain "preflight/src/domain"
+	"preflight/src/domain"
+	"preflight/src/io"
 	"preflight/src/render"
 	"runtime"
 	"time"
@@ -35,7 +36,7 @@ type systemCheckMsg struct{ check bool }
 
 func (p PreflightModel) runCheckpoint() tea.Cmd {
 	checkpoint := p.getActiveCheckpoint()
-	interpreter, err := GetInterpreterCommand(runtime.GOOS)
+	interpreter, err := io.GetInterpreterCommand(runtime.GOOS)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
