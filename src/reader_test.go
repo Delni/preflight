@@ -57,7 +57,7 @@ func TestReadChecklist(t *testing.T) {
 func TestReadChecklistMalformatedFile(t *testing.T) {
 	_, err := ReadChecklist([]byte("fake_yml"))
 
-	want := "cannot unmarshal !!str `fake_yml` into []preflight.SystemCheck"
+	want := "cannot unmarshal !!str `fake_yml` into []domain.SystemCheck"
 	if !strings.Contains(err.Error(), want) {
 		t.Errorf("got %+v, want %+v", err, want)
 	}
