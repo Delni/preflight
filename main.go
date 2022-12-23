@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	preflight "preflight/src"
+	io "preflight/src/io"
 	"sort"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,16 +31,16 @@ Written with %s in %s.`, heart.Render("❤️"), golor.Render("Go")),
 			err       error
 		)
 		if Remote {
-			dataBytes, err = preflight.ReadHttpFile(args[0])
+			dataBytes, err = io.ReadHttpFile(args[0])
 		} else {
-			dataBytes, err = preflight.ReadFile(args[0])
+			dataBytes, err = io.ReadFile(args[0])
 		}
 
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
-		systemCheck, err := preflight.ReadChecklist(dataBytes)
+		systemCheck, err := io.ReadChecklist(dataBytes)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

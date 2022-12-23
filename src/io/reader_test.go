@@ -1,4 +1,4 @@
-package preflight
+package io
 
 import (
 	"io/ioutil"
@@ -12,8 +12,18 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var testSystemCheck = domain.SystemCheck{
+	Name:        "SYSTEM_CHECK",
+	Description: "DESCRIPTION",
+	Optional:    false,
+	Checkpoints: []domain.Checkpoint{
+		{Name: "CHECKPOINT", Command: "CMD", Documentation: "DOC", UseInteractive: true},
+	},
+	Check: false,
+}
+
 func fakeYamlSystemCheckBytes() []byte {
-	data := []domain.SystemCheck{fakeSystemCheck()}
+	data := []domain.SystemCheck{testSystemCheck}
 	dataBytes, err := yaml.Marshal(&data)
 	if err != nil {
 		log.Fatal(err)
@@ -47,7 +57,7 @@ func TestReadChecklist(t *testing.T) {
 		t.Errorf("got error %s when reading check list: ", err.Error())
 	}
 
-	want := []domain.SystemCheck{fakeSystemCheck()}
+	want := []domain.SystemCheck{testSystemCheck}
 	if !reflect.DeepEqual(systemCheck, want) {
 		t.Errorf("got %+v, want %+v", systemCheck, want)
 	}
