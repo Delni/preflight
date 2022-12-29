@@ -61,7 +61,7 @@
 				
 				<option value="file2">preflight/src/preflight/model.go (100.0%)</option>
 				
-				<option value="file3">preflight/src/preflight/program.go (41.7%)</option>
+				<option value="file3">preflight/src/preflight/program.go (91.7%)</option>
 				
 				<option value="file4">preflight/src/preflight/render.go (100.0%)</option>
 				
@@ -228,32 +228,32 @@ func (p PreflightModel) Init() tea.Cmd <span class="cov0" title="0">{
         )
 }</span>
 
-func (p PreflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) <span class="cov0" title="0">{
+func (p PreflightModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) <span class="cov8" title="1">{
         var cmd tea.Cmd
         switch msg := msg.(type) </span>{
-        case tea.WindowSizeMsg:<span class="cov0" title="0">
+        case tea.WindowSizeMsg:<span class="cov8" title="1">
                 p.progress.Width = msg.Width</span>
-        case tea.KeyMsg:<span class="cov0" title="0">
+        case tea.KeyMsg:<span class="cov8" title="1">
                 switch msg.String() </span>{
-                case "ctrl+c", "esc", "q":<span class="cov0" title="0">
+                case "ctrl+c", "esc", "q":<span class="cov8" title="1">
                         return p, tea.Quit</span>
                 }
-        case systemCheckMsg:<span class="cov0" title="0">
+        case systemCheckMsg:<span class="cov8" title="1">
                 return p.UpdateInternalState(msg)</span>
-        case progress.FrameMsg:<span class="cov0" title="0">
+        case progress.FrameMsg:<span class="cov8" title="1">
                 return p.UpdateProgress(msg)</span>
         default:<span class="cov0" title="0">
                 p.spinner, cmd = p.spinner.Update(msg)</span>
         }
-        <span class="cov0" title="0">return p, cmd</span>
+        <span class="cov8" title="1">return p, cmd</span>
 }
 
-func (p PreflightModel) UpdateProgress(msg progress.FrameMsg) (PreflightModel, tea.Cmd) <span class="cov0" title="0">{
+func (p PreflightModel) UpdateProgress(msg progress.FrameMsg) (PreflightModel, tea.Cmd) <span class="cov8" title="1">{
         newModel, cmd := p.progress.Update(msg)
-        if newModel, ok := newModel.(progress.Model); ok </span><span class="cov0" title="0">{
+        if newModel, ok := newModel.(progress.Model); ok </span><span class="cov8" title="1">{
                 p.progress = newModel
         }</span>
-        <span class="cov0" title="0">return p, cmd</span>
+        <span class="cov8" title="1">return p, cmd</span>
 }
 
 func (p PreflightModel) View() string <span class="cov8" title="1">{
