@@ -12,7 +12,9 @@ var (
 	CurrentPkgNameStyle = lipgloss.NewStyle().Foreground(Honey)
 	PkgNameStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("242"))
 	// Icons
+	Heart       = lipgloss.NewStyle().Foreground(lipgloss.Color("161")).SetString("❤️")
 	CheckMark   = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
 	WarningMark = lipgloss.NewStyle().Foreground(lipgloss.Color("214")).SetString("!")
 	KoMark      = lipgloss.NewStyle().Foreground(lipgloss.Color("197")).SetString("✕")
+	Golor       = lipgloss.NewStyle().Foreground(lipgloss.Color("#00ADD8")).SetString("Go")
 )
