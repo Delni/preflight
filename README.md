@@ -28,6 +28,7 @@ The `path/to/yaml/descriptor` is a `YAML` file with a list of *System Checks*. Y
 ### Don't have the file locally ?
 
 Preflight got you! If you have an URL, Preflight will fetch the file for you and run as usual after that. Just pass the `--remote` (`-r`) flag:
+
 ![demo.remote](./docs/demo.remote.gif)
 
 ### How to write a checklist 👨‍✈

@@ -10,7 +10,7 @@ Set Height 600
 Sleep 1s
 Type "preflight --remote "
 Sleep 250ms
-Type@10ms "https://raw.githubusercontent.com/delni/preflight/main/checklists/demo.yaml"
+Type@10ms "https://raw.githubusercontent.com/delni/preflight/main/docs/demo.yaml"
 Sleep 500ms
 Enter
 
