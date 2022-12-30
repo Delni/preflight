@@ -21,6 +21,7 @@ var rootCmd = &cobra.Command{
 	Short: fmt.Sprintf("Automate checklist to ensure you are ready to %s 🛫", styles.Golor),
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println()
 		var (
 			dataBytes []byte
 			err       error

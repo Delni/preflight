@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"preflight/src/io"
 	"preflight/src/styles"
-	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -21,6 +20,15 @@ type loadOverHttpModel struct {
 	body     []byte
 	quitting bool
 	err      error
+}
+
+func (m loadOverHttpModel) getSentence(prefix interface{}, done bool) string {
+	verb := "Fetching"
+	if done {
+		verb = "Fetched"
+	}
+	sentence := styles.PkgNameStyle.Render(fmt.Sprintf("%s file from %s", verb, m.url))
+	return styles.PkgNameStyle.Render(fmt.Sprintf("%s %s\n", prefix, sentence))
 }
 
 func initialModel(url string) loadOverHttpModel {
@@ -47,17 +55,19 @@ func (m loadOverHttpModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case responseMsg:
 		m.body = msg
-		return m, tea.Quit
+
+		m.quitting = true
+
+		return m, tea.Printf(m.getSentence(styles.CheckMark, true))
 	case errMsg:
 		m.err = msg
-		return m, tea.Tick(time.Duration(2*time.Second), func(t time.Time) tea.Msg {
-			m.quitting = true
-			return nil
-		})
+		m.quitting = true
+		return m, nil
 
 	default:
 		var cmd tea.Cmd
 		m.spinner, cmd = m.spinner.Update(msg)
+
 		if m.quitting {
 			return m, tea.Quit
 		}
@@ -67,15 +77,12 @@ func (m loadOverHttpModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m loadOverHttpModel) View() string {
-	str := fmt.Sprintf("%s Fetching file from %s...\n", m.spinner.View(), m.url)
+	str := m.getSentence(m.spinner.View(), false)
 	if m.err != nil {
 		return m.err.Error()
 	}
-	if m.quitting {
-		return str + string(m.err.Error()) + "\n"
-	}
 	if len(m.body) != 0 {
-		return string(m.body)
+		return ""
 	}
 	return str
 }
