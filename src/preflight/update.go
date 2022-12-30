@@ -4,35 +4,18 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"preflight/src/io"
 	"runtime"
 	"time"
 
-	"github.com/charmbracelet/bubbles/progress"
-	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 )
-
-type PreflightModel struct {
-	checks                []SystemCheck
-	spinner               spinner.Model
-	progress              progress.Model
-	activeIndex           int
-	activeCheckpointIndex int
-	done                  bool
-}
-
-func (p PreflightModel) getActive() *SystemCheck {
-	return &p.checks[p.activeIndex]
-}
-func (p PreflightModel) getActiveCheckpoint() Checkpoint {
-	return p.getActive().Checkpoints[p.activeCheckpointIndex]
-}
 
 type systemCheckMsg struct{ check bool }
 
 func (p PreflightModel) runCheckpoint() tea.Cmd {
 	checkpoint := p.getActiveCheckpoint()
-	interpreter, err := GetInterpreterCommand(runtime.GOOS)
+	interpreter, err := io.GetInterpreterCommand(runtime.GOOS)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -75,29 +58,4 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
 		)
 	}
 	return p, p.runCheckpoint()
-}
-
-func (p PreflightModel) RenderConclusion() string {
-	hasFail := false
-	hasWarning := false
-	for _, systemCheck := range p.checks {
-		if !systemCheck.Check {
-			if systemCheck.Optional {
-				hasWarning = true
-			} else {
-				hasFail = true
-				break
-			}
-		}
-	}
-
-	if hasFail {
-		return koMark.Render("\n\n No go, no go! Check above for more details. 🛬\n")
-	}
-
-	if hasWarning {
-		return warningMark.Render("\n\n You're good to go, but check above, some checks were unsuccessful 🎫\n")
-	}
-
-	return checkMark.Render("\n\nDone! You're good to go 🛫\n")
 }

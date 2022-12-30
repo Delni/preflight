@@ -1,4 +1,4 @@
-package preflight
+package systemcheck
 
 import (
 	"strings"
@@ -35,7 +35,7 @@ func TestRenderActive(t *testing.T) {
 	system := fakeSystemCheck()
 	spinner := fakeSpinner()
 
-	ans := system.Render(true, spinner)
+	ans := system.RenderSystemCheck(true, spinner)
 
 	want := "| SYSTEM_CHECK\n"
 	if ans != want {
@@ -47,7 +47,7 @@ func TestRenderInactive(t *testing.T) {
 	system := fakeSystemCheck()
 	spinner := fakeSpinner()
 
-	ans := system.Render(false, spinner)
+	ans := system.RenderSystemCheck(false, spinner)
 
 	want := "- SYSTEM_CHECK\n"
 	if ans != want {

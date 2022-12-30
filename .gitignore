@@ -1,6 +1,10 @@
 checklists
 !checklists/demo.yaml
 
+.DS_Store
+
 # ignore generated files
 bin
 preflight
+!src/preflight
+coverage.out
