@@ -16,7 +16,11 @@ func Run(cmd *cobra.Command, args []string) {
 
 	var systemChecks []systemcheck.SystemCheck
 
-	systemChecks = ReadFile(args[0])
+	if cmd.Flags().Lookup("checklists").Changed {
+		systemChecks = UsePresets(Checklist)
+	} else {
+		systemChecks = ReadFile(args[0])
+	}
 
 	sort.SliceStable(systemChecks, func(a, b int) bool {
 		return systemChecks[a].Name < systemChecks[b].Name

@@ -9,11 +9,12 @@ import (
 )
 
 var Remote bool
+var Checklist []string
 
 var rootCmd = &cobra.Command{
 	Use:   "preflight [flags] [checklist file]",
 	Short: fmt.Sprintf("Automate checklist to ensure you are ready to %s 🛫", styles.Golor),
-	Args:  cobra.ExactArgs(1),
+	Args:  ValidateArgs,
 	Run:   Run,
 }
 
@@ -24,6 +25,9 @@ func PreflightCommand() *cobra.Command {
 	rootCmd.
 		Flags().
 		BoolVarP(&Remote, "remote", "r", false, "Fetch your checklist file from a remote server.")
+	rootCmd.
+		Flags().
+		StringArrayVarP(&Checklist, "checklists", "c", nil, "Use predefined checklists")
 
 	return rootCmd
 }
