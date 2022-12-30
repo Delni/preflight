@@ -11,7 +11,7 @@
 
 Preflight will run a list of commands for you to make sure that you are ready to go on your journey. This can be usefull when you are reinstalling your computer and are used to some configuration, or to make sure that the onboarding in a new team is complete.  
 
-![demo](./docs/demo.gif)
+![demo](./docs/demo.local.gif)
 
 ## Install ⬇️
 
@@ -23,7 +23,12 @@ For now, simply download [preflight](./preflight) and run it. More options will 
 preflight path/to/yaml/descriptor
 ```
 
-The `path/to/yaml/descriptor` is a `YAML` file with a list of *System Checks*. You can find an exemple in [checklists/demo.yaml](./checklists/demo.yaml). Feel free to download and edit it to fit your needs, it showcases every possibilities.
+The `path/to/yaml/descriptor` is a `YAML` file with a list of *System Checks*. You can find an exemple in [docs/demo.yaml](./docs/demo.yaml). Feel free to download and edit it to fit your needs, it showcases every possibilities.
+
+### Don't have the file locally ?
+
+Preflight got you! If you have an URL, Preflight will fetch the file for you and run as usual after that. Just pass the `--remote` (`-r`) flag:
+![demo.remote](./docs/demo.remote.gif)
 
 ### How to write a checklist 👨‍✈
 
@@ -47,7 +52,7 @@ And each `Checkpoint` is defined as follow:
 ## Roadmap 🚦
 
 - [x] File based decriptor
-- [ ] fetch file from public URL
+- [x] fetch file from public URL
 - [ ] Make it installable seamlessly
 - [ ] Add flag-based descriptor for major use-cases. Go fileless  
     Currently supported Systems:

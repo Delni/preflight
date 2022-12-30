@@ -26,7 +26,7 @@
     - name: second option
       command: this is failing
       documentation: You need one of the checkpoints though
-- name: F. Failing Command
+- name: E. Failing Command
   description: This will fail, you should do something about it
   checkpoints:
     - name: fail
