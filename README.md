@@ -15,7 +15,7 @@ Preflight will run a list of commands for you to make sure that you are ready to
 
 ## Install ⬇️
 
-For now, simply download [preflight](./preflight) and run it. More options will come 💪
+For now, simply download [preflight](https://github.com/Delni/preflight/releases/latest) and run it. More options will come 💪
 
 ## Usage 🚀
 
