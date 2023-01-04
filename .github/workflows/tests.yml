@@ -35,6 +35,7 @@ jobs:
           echo "COVERAGE_BADGE_COLOR=$(echo $color)" >> $GITHUB_ENV
 
       - name: Generate coverage badge
+        if: github.ref_name == 'main'
         uses: emibcn/badge-action@v1.2.1
         with:
           label: 'Coverage'
