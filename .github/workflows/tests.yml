@@ -45,6 +45,7 @@ jobs:
           path: 'coverage-report/coverage-badge.svg'
 
       - name: Publish coverage report to GitHub Pages
+        if: github.ref_name == 'main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: coverage-report
