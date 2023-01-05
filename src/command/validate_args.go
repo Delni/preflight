@@ -7,7 +7,8 @@ import (
 )
 
 func ValidateArgs(cmd *cobra.Command, args []string) error {
-	if len(args) < 1 && len(Checklist) < 1 {
+	checklists := cmd.Flag("checklists").Value.String()
+	if len(args) < 1 && len(checklists) <= 2 {
 		return errors.New("requires a path to the checklist file or a list of presets")
 	}
 	return nil
