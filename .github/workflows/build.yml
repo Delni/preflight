@@ -2,8 +2,8 @@ name: Build Executables
 
 on:
   push:
-    # branches:
-      # - main
+    branches:
+      - main
 
 jobs:
   build:
@@ -20,7 +20,7 @@ jobs:
       - name: Build
         run: ./build.sh
 
-      - name: 'Upload Artifact'
+      - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
           name: Generated executables
