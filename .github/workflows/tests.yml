@@ -1,9 +1,9 @@
-name: Build
+name: Tests & Coverage
 
 on: [push]
 
 jobs:
-  build:
+  tests:
 
     runs-on: ubuntu-latest
     steps:
@@ -14,12 +14,9 @@ jobs:
         with:
           go-version: 1.18
 
-      - name: Build
-        run: go build -v
-
       - name: Test
         run: |
-          go test -v ./... -coverprofile=coverage.out
+          go test -v ./... -coverpkg=./... -coverprofile=coverage.out
           mkdir coverage-report
           touch coverage-report/index.html
           go tool cover -html=coverage.out -o=coverage-report/index.html
@@ -27,6 +24,7 @@ jobs:
           pct=$(cat coverage.out | grep total | grep -Po '\d+(?:\.\d+)?%')
           echo "COVERAGE_PERCENTAGE=$pct" >> $GITHUB_ENV
           pct=$(echo $pct | sed "s/%//")
+          echo "Global coverage: $pct%"
           pct_int=${pct/\.*}
           if [[ $pct_int -lt 30 ]]; then
             color=red
@@ -36,8 +34,13 @@ jobs:
             color=green
           fi
           echo "COVERAGE_BADGE_COLOR=$(echo $color)" >> $GITHUB_ENV
+          if [[ $pct_int -lt 70 ]]; then
+            echo "Coverage is below 70%"
+            exit 1
+          fi
 
       - name: Generate coverage badge
+        if: github.ref_name == 'main'
         uses: emibcn/badge-action@v1.2.1
         with:
           label: 'Coverage'
@@ -46,6 +49,7 @@ jobs:
           path: 'coverage-report/coverage-badge.svg'
 
       - name: Publish coverage report to GitHub Pages
+        if: github.ref_name == 'main'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: coverage-report

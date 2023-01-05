@@ -2,7 +2,6 @@ package preflight
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"preflight/src/io"
 	"runtime"
@@ -18,7 +17,7 @@ func (p PreflightModel) runCheckpoint() tea.Cmd {
 	interpreter, err := io.GetInterpreterCommand(runtime.GOOS)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		return tea.Quit
 	}
 	interpreterArg := interpreter.InterpreterArgs
 	if checkpoint.UseInteractive {
