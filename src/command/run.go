@@ -3,6 +3,7 @@ package command
 import (
 	"fmt"
 	"os"
+	"preflight/presets"
 	"preflight/src/preflight"
 	"preflight/src/programs"
 	"preflight/src/styles"
@@ -20,7 +21,7 @@ func Run(cmd *cobra.Command, args []string) {
 	var systemChecks []systemcheck.SystemCheck
 
 	if cmd.Flag("checklists").Changed {
-		systemChecks = programs.UsePresets(strings.Split(Checklist[0], ","))
+		systemChecks = programs.UsePresets(strings.Split(Checklist[0], ","), presets.Presets)
 	} else {
 		systemChecks = ReadFile(args[0])
 	}

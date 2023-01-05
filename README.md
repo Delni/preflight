@@ -2,11 +2,12 @@
 
 > Automate your tooling checklist with Preflight
 
+[![Tests](https://github.com/Delni/preflight/actions/workflows/tests.yml/badge.svg)](https://github.com/Delni/preflight/actions/workflows/tests.yml)
+[![Build](https://github.com/Delni/preflight/actions/workflows/build.yml/badge.svg)](https://github.com/Delni/preflight/actions/workflows/build.yml)
 ![Go version](https://img.shields.io/github/go-mod/go-version/delni/preflight?style=flat&color=00ADD8)
 ![Last Commit](https://img.shields.io/github/last-commit/delni/preflight?style=flat)
 ![Contributors](https://img.shields.io/github/contributors/delni/preflight?style=flat)
 [![License](https://img.shields.io/github/license/delni/preflight?style=flat)](./LICENSE)
-![Build](https://github.com/Delni/preflight/actions/workflows/ci.yml/badge.svg)
 [![Coverage](https://delni.github.io/preflight/coverage-badge.svg)](https://delni.github.io/preflight/index.html)
 
 Preflight will run a list of commands for you to make sure that you are ready to go on your journey. This can be usefull when you are reinstalling your computer and are used to some configuration, or to make sure that the onboarding in a new team is complete.  
@@ -58,8 +59,8 @@ And each `Checkpoint` is defined as follow:
 - [ ] Add flag-based descriptor for major use-cases. Go fileless  
     Currently supported Systems:
     - Node
-    - Yarn
     - Node Version Managers (nvm, n, volta)
+    - Yarn
     - Missing some config ? Feel free to [open an issue](https://github.com/Delni/preflight/issues/new) to discuss it, and read [related docs](./presets/README.md)!
 
 ## How to contribute 📝
