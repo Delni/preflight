@@ -26,6 +26,17 @@ Type "preflight docs/demo.yaml"
 Sleep 500ms
 Enter
 
+# Clean the preview for next command
+
+Sleep 10s
+Ctrl+L
+Sleep 1s
+
+# Type a command in the terminal.
+Type "preflight --checklists node,node-version,yarn"
+Sleep 500ms
+Enter
+
 # Admire the output for a bit.
 Sleep 10s
 Ctrl+L
