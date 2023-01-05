@@ -57,8 +57,9 @@ And each `Checkpoint` is defined as follow:
 - [ ] Make it installable seamlessly
 - [ ] Add flag-based descriptor for major use-cases. Go fileless  
     Currently supported Systems:
-    - Missing some config ? Feel free to [open an issue](https://github.com/Delni/preflight/issues/new) to discuss it !
+    - Missing some config ? Feel free to [open an issue](https://github.com/Delni/preflight/issues/new) to discuss it, and read [related docs](./presets/README.md)!
 
 ## How to contribute 📝
 
-➡️ See [CONTRIBUTING](./CONTRIBUTING.md) 
+➡️ See [CONTRIBUTING](./CONTRIBUTING.md)  
+➡️ Want to add a new preset ? See [presets docs](./presets/README.md)

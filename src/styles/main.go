@@ -10,7 +10,7 @@ var (
 	// Writings
 	Greetings           = lipgloss.NewStyle().Foreground(Ocean).SetString("Checking preflight conditions:\n")
 	CurrentPkgNameStyle = lipgloss.NewStyle().Foreground(Honey)
-	PkgNameStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("242"))
+	PkgNameStyle        = lipgloss.NewStyle().Foreground(lipgloss.Color("245"))
 	// Icons
 	Heart       = lipgloss.NewStyle().Foreground(lipgloss.Color("161")).SetString("❤️")
 	CheckMark   = lipgloss.NewStyle().Foreground(lipgloss.Color("42")).SetString("✓")
