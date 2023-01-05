@@ -6,4 +6,5 @@ import "preflight/src/systemcheck"
 var Presets = map[string]systemcheck.SystemCheck{
 	"node":         node,
 	"node-version": nodeVersion,
+	"yarn":         yarn,
 }
