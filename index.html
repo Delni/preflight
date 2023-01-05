@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>command: Go Coverage Report</title>
+		<title>preflight: Go Coverage Report</title>
 		<style>
 			body {
 				background: black;
@@ -55,27 +55,33 @@
 			<div id="nav">
 				<select id="files">
 				
-				<option value="file0">preflight/src/command/prefligh_command.go (100.0%)</option>
+				<option value="file0">preflight/main.go (0.0%)</option>
 				
-				<option value="file1">preflight/src/command/read_file.go (0.0%)</option>
+				<option value="file1">preflight/src/command/prefligh_command.go (100.0%)</option>
 				
-				<option value="file2">preflight/src/command/run.go (0.0%)</option>
+				<option value="file2">preflight/src/command/read_file.go (0.0%)</option>
 				
-				<option value="file3">preflight/src/command/validate_args.go (100.0%)</option>
+				<option value="file3">preflight/src/command/run.go (0.0%)</option>
 				
-				<option value="file4">preflight/src/io/os_interpreter.go (100.0%)</option>
+				<option value="file4">preflight/src/command/validate_args.go (100.0%)</option>
 				
-				<option value="file5">preflight/src/io/reader.go (46.7%)</option>
+				<option value="file5">preflight/src/io/os_interpreter.go (100.0%)</option>
 				
-				<option value="file6">preflight/src/preflight/model.go (100.0%)</option>
+				<option value="file6">preflight/src/io/reader.go (46.7%)</option>
 				
-				<option value="file7">preflight/src/preflight/program.go (91.7%)</option>
+				<option value="file7">preflight/src/preflight/model.go (100.0%)</option>
 				
-				<option value="file8">preflight/src/preflight/render.go (100.0%)</option>
+				<option value="file8">preflight/src/preflight/program.go (91.7%)</option>
 				
-				<option value="file9">preflight/src/preflight/update.go (77.8%)</option>
+				<option value="file9">preflight/src/preflight/render.go (100.0%)</option>
 				
-				<option value="file10">preflight/src/systemcheck/render.go (100.0%)</option>
+				<option value="file10">preflight/src/preflight/update.go (85.2%)</option>
+				
+				<option value="file11">preflight/src/programs/load_http_file.go (72.5%)</option>
+				
+				<option value="file12">preflight/src/programs/use_presets.go (100.0%)</option>
+				
+				<option value="file13">preflight/src/systemcheck/render.go (100.0%)</option>
 				
 				</select>
 			</div>
@@ -89,7 +95,23 @@
 		</div>
 		<div id="content">
 		
-		<pre class="file" id="file0" style="display: none">package command
+		<pre class="file" id="file0" style="display: none">package main
+
+import (
+        "fmt"
+        "os"
+        "preflight/src/command"
+)
+
+func main() <span class="cov0" title="0">{
+        if err := command.PreflightCommand().Execute(); err != nil </span><span class="cov0" title="0">{
+                fmt.Println(err)
+                os.Exit(1)
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package command
 
 import (
         "fmt"
@@ -136,7 +158,7 @@ func makeLongDescription() string <span class="cov8" title="1">{
 }</span>
 </pre>
 		
-		<pre class="file" id="file1" style="display: none">package command
+		<pre class="file" id="file2" style="display: none">package command
 
 import (
         "fmt"
@@ -171,11 +193,12 @@ func ReadFile(filePath string) []systemcheck.SystemCheck <span class="cov0" titl
 }
 </pre>
 		
-		<pre class="file" id="file2" style="display: none">package command
+		<pre class="file" id="file3" style="display: none">package command
 
 import (
         "fmt"
         "os"
+        "preflight/presets"
         "preflight/src/preflight"
         "preflight/src/programs"
         "preflight/src/styles"
@@ -193,7 +216,7 @@ func Run(cmd *cobra.Command, args []string) <span class="cov0" title="0">{
         var systemChecks []systemcheck.SystemCheck
 
         if cmd.Flag("checklists").Changed </span><span class="cov0" title="0">{
-                systemChecks = programs.UsePresets(strings.Split(Checklist[0], ","))
+                systemChecks = programs.UsePresets(strings.Split(Checklist[0], ","), presets.Presets)
         }</span> else<span class="cov0" title="0"> {
                 systemChecks = ReadFile(args[0])
         }</span>
@@ -215,7 +238,7 @@ func Run(cmd *cobra.Command, args []string) <span class="cov0" title="0">{
 }
 </pre>
 		
-		<pre class="file" id="file3" style="display: none">package command
+		<pre class="file" id="file4" style="display: none">package command
 
 import (
         "errors"
@@ -232,7 +255,7 @@ func ValidateArgs(cmd *cobra.Command, args []string) error <span class="cov8" ti
 }
 </pre>
 		
-		<pre class="file" id="file4" style="display: none">package io
+		<pre class="file" id="file5" style="display: none">package io
 
 import (
         "fmt"
@@ -278,7 +301,7 @@ func GetInterpreterCommand(os string) (OSInterpreter, error) <span class="cov8" 
 }
 </pre>
 		
-		<pre class="file" id="file5" style="display: none">package io
+		<pre class="file" id="file6" style="display: none">package io
 
 import (
         "io"
@@ -319,7 +342,7 @@ func ReadChecklist(checklist []byte) ([]systemcheck.SystemCheck, error) <span cl
 }
 </pre>
 		
-		<pre class="file" id="file6" style="display: none">package preflight
+		<pre class="file" id="file7" style="display: none">package preflight
 
 import (
         "fmt"
@@ -363,7 +386,7 @@ func InitPreflightModel(systemCheck []systemcheck.SystemCheck) PreflightModel <s
 }</span>
 </pre>
 		
-		<pre class="file" id="file7" style="display: none">package preflight
+		<pre class="file" id="file8" style="display: none">package preflight
 
 import (
         "strings"
@@ -426,7 +449,7 @@ func (p PreflightModel) View() string <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file8" style="display: none">package preflight
+		<pre class="file" id="file9" style="display: none">package preflight
 
 import "preflight/src/styles"
 
@@ -456,11 +479,10 @@ func (p PreflightModel) RenderConclusion() string <span class="cov8" title="1">{
 }
 </pre>
 		
-		<pre class="file" id="file9" style="display: none">package preflight
+		<pre class="file" id="file10" style="display: none">package preflight
 
 import (
         "fmt"
-        "os"
         "os/exec"
         "preflight/src/io"
         "runtime"
@@ -476,7 +498,7 @@ func (p PreflightModel) runCheckpoint() tea.Cmd <span class="cov8" title="1">{
         interpreter, err := io.GetInterpreterCommand(runtime.GOOS)
         if err != nil </span><span class="cov0" title="0">{
                 fmt.Println(err)
-                os.Exit(1)
+                return tea.Quit
         }</span>
         <span class="cov8" title="1">interpreterArg := interpreter.InterpreterArgs
         if checkpoint.UseInteractive </span><span class="cov8" title="1">{
@@ -506,7 +528,7 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
                         p.done = true
                         return p, tea.Quit
                 }</span>
-                <span class="cov0" title="0">progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
+                <span class="cov8" title="1">progressCmd := p.progress.SetPercent(float64(p.activeIndex) / float64(len(p.checks)))
                 return p, tea.Batch(
                         progressCmd,
                         tea.Tick(time.Millisecond*time.Duration(150), func(t time.Time) tea.Msg </span><span class="cov0" title="0">{
@@ -519,7 +541,170 @@ func (p PreflightModel) UpdateInternalState(msg systemCheckMsg) (PreflightModel,
 }
 </pre>
 		
-		<pre class="file" id="file10" style="display: none">package systemcheck
+		<pre class="file" id="file11" style="display: none">package programs
+
+import (
+        "fmt"
+        "preflight/src/io"
+        "preflight/src/styles"
+
+        "github.com/charmbracelet/bubbles/spinner"
+        tea "github.com/charmbracelet/bubbletea"
+        "github.com/charmbracelet/lipgloss"
+)
+
+type responseMsg []byte
+
+type errMsg struct{ error }
+
+type loadOverHttpModel struct {
+        url      string
+        spinner  spinner.Model
+        body     []byte
+        quitting bool
+        err      error
+}
+
+func (m loadOverHttpModel) getSentence(prefix interface{}, done bool) string <span class="cov8" title="1">{
+        verb := "Fetching"
+        if done </span><span class="cov8" title="1">{
+                verb = "Fetched"
+        }</span>
+        <span class="cov8" title="1">sentence := styles.PkgNameStyle.Render(fmt.Sprintf("%s file from %s", verb, m.url))
+        return styles.PkgNameStyle.Render(fmt.Sprintf("%s %s\n", prefix, sentence))</span>
+}
+
+func initialModel(url string) loadOverHttpModel <span class="cov8" title="1">{
+        s := spinner.New()
+        s.Spinner = spinner.MiniDot
+        s.Style = lipgloss.NewStyle().Foreground(styles.Honey)
+        return loadOverHttpModel{spinner: s, url: url}
+}</span>
+
+func (m loadOverHttpModel) Init() tea.Cmd <span class="cov0" title="0">{
+        return tea.Batch(m.checkServer, m.spinner.Tick)
+}</span>
+
+func (m loadOverHttpModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) <span class="cov8" title="1">{
+        switch msg := msg.(type) </span>{
+        case tea.KeyMsg:<span class="cov8" title="1">
+                switch msg.String() </span>{
+                case "q", "esc", "ctrl+c":<span class="cov8" title="1">
+                        m.quitting = true
+                        return m, tea.Quit</span>
+                default:<span class="cov0" title="0">
+                        return m, nil</span>
+                }
+
+        case responseMsg:<span class="cov8" title="1">
+                m.body = msg
+
+                m.quitting = true
+
+                return m, tea.Printf(m.getSentence(styles.CheckMark, true))</span>
+        case errMsg:<span class="cov8" title="1">
+                m.err = msg
+                m.quitting = true
+                return m, nil</span>
+
+        default:<span class="cov8" title="1">
+                var cmd tea.Cmd
+                m.spinner, cmd = m.spinner.Update(msg)
+
+                if m.quitting </span><span class="cov8" title="1">{
+                        return m, tea.Quit
+                }</span>
+
+                <span class="cov8" title="1">return m, cmd</span>
+        }
+}
+
+func (m loadOverHttpModel) View() string <span class="cov8" title="1">{
+        str := m.getSentence(m.spinner.View(), false)
+        if m.err != nil </span><span class="cov0" title="0">{
+                return m.err.Error()
+        }</span>
+        <span class="cov8" title="1">if len(m.body) != 0 </span><span class="cov8" title="1">{
+                return ""
+        }</span>
+        <span class="cov8" title="1">return str</span>
+}
+
+func (m loadOverHttpModel) checkServer() tea.Msg <span class="cov0" title="0">{
+        body, err := io.ReadHttpFile(m.url)
+        if err != nil </span><span class="cov0" title="0">{
+                return errMsg{err}
+        }</span>
+        <span class="cov0" title="0">return responseMsg(body)</span>
+}
+
+func LoadHttpFileFrom(url string) ([]byte, error) <span class="cov0" title="0">{
+        model, err := tea.NewProgram(initialModel(url)).Run()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return model.(loadOverHttpModel).body, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file12" style="display: none">package programs
+
+import (
+        "fmt"
+        p "preflight/presets"
+        "preflight/src/styles"
+        "preflight/src/systemcheck"
+        "sort"
+        "strings"
+)
+
+func displayPresetError(err_presets []string) <span class="cov8" title="1">{
+        fmt.Println(styles.KoMark.Render("Unknown presets:"))
+        for _, err := range err_presets </span><span class="cov8" title="1">{
+                fmt.Println(styles.KoMark.Render("   - " + err))
+        }</span>
+
+        <span class="cov8" title="1">fmt.Println(styles.KoMark.Render("\n" + AvailablePresets(p.Presets)))
+        fmt.Println(styles.PkgNameStyle.Render("Thinks that something is missing? Please open an issue on https://github.com/delni/preflight/issues/new"))
+
+        fmt.Println()</span>
+}
+
+func UsePresets(presetsCandidate []string, knownPresets map[string]systemcheck.SystemCheck) []systemcheck.SystemCheck <span class="cov8" title="1">{
+        var err_presets = []string{}
+        var systemcheck = []systemcheck.SystemCheck{}
+        for _, presetName := range presetsCandidate </span><span class="cov8" title="1">{
+                preset, exists := knownPresets[presetName]
+                if !exists </span><span class="cov8" title="1">{
+                        err_presets = append(err_presets, presetName)
+                }</span> else<span class="cov8" title="1"> {
+                        systemcheck = append(systemcheck, preset)
+                }</span>
+        }
+        <span class="cov8" title="1">if len(err_presets) &gt; 0 </span><span class="cov8" title="1">{
+                displayPresetError(err_presets)
+        }</span>
+        <span class="cov8" title="1">return systemcheck</span>
+}
+
+func AvailablePresets(knownPresets map[string]systemcheck.SystemCheck) string <span class="cov8" title="1">{
+        var (
+                builder = strings.Builder{}
+                keys    = []string{}
+        )
+
+        for name := range knownPresets </span><span class="cov8" title="1">{
+                keys = append(keys, name)
+        }</span>
+
+        <span class="cov8" title="1">sort.Strings(keys)
+        builder.WriteString("Available presets are: ")
+        builder.WriteString(strings.Join(keys, ", "))
+        return builder.String()</span>
+}
+</pre>
+		
+		<pre class="file" id="file13" style="display: none">package systemcheck
 
 import (
         "fmt"
