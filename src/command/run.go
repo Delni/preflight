@@ -19,7 +19,7 @@ func Run(cmd *cobra.Command, args []string) {
 
 	var systemChecks []systemcheck.SystemCheck
 
-	if cmd.Flags().Lookup("checklists").Changed {
+	if cmd.Flag("checklists").Changed {
 		systemChecks = programs.UsePresets(strings.Split(Checklist[0], ","))
 	} else {
 		systemChecks = ReadFile(args[0])
