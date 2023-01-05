@@ -8,17 +8,19 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var Remote bool
-var Checklist []string
-
-var rootCmd = &cobra.Command{
-	Use:   "preflight [flags] [checklist file]",
-	Short: fmt.Sprintf("Automate checklist to ensure you are ready to %s 🛫", styles.Golor),
-	Args:  ValidateArgs,
-	Run:   Run,
-}
+var (
+	Remote    bool
+	Checklist []string
+)
 
 func PreflightCommand() *cobra.Command {
+	var rootCmd = &cobra.Command{
+		Use:   "preflight [flags] [checklist file]",
+		Short: fmt.Sprintf("Automate checklist to ensure you are ready to %s 🛫", styles.Golor),
+		Args:  ValidateArgs,
+		Run:   Run,
+	}
+
 	// Add long description
 	rootCmd.Long = makeLongDescription()
 	// Add flags
